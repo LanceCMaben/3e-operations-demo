@@ -1,5 +1,19 @@
 # 3E Operations
 
+## View the dashboard
+
+| | |
+|---|---|
+| **Live demo (synthetic data)** | **[https://lancecmaben.github.io/3e-operations-demo/](https://lancecmaben.github.io/3e-operations-demo/)** |
+| From this repo | **About** → **Website** on the repo home (same URL) |
+
+[![Open live demo](thumbnail.png)](https://lancecmaben.github.io/3e-operations-demo/)
+
+---
+
+<details>
+<summary><strong>Domo team notes (3enrollment source)</strong></summary>
+
 **Repo home:** [`eee_internal_insights`](https://github.com/3enrollment/eee_internal_insights) → folder `3E_Operations/`  
 **Portal:** 3E Insights Portal · ClearSquare **Development → internal** (Dev card) or internal Prod page
 
@@ -88,3 +102,5 @@ Bump `version` in the manifest you are publishing before each publish. Hard-refr
 ## Node / vendor
 
 `package.json` and `vendor/domo.js`. Do not commit `node_modules`.
+
+</details>
