@@ -6,7 +6,7 @@ Static snapshot of **3E Operations** from `3enrollment/eee_internal_insights` â†
 
 **https://lancecmaben.github.io/3e-operations-demo/**
 
-Internal Operations card â€” requires Domo and internal datasets. Pages deployment mirrors the design files for reference; not a working demo without Domo.
+**Demo mode:** Overview, filters, and Partner Data Health load from fictional partners/campaigns via an in-browser SQL shim. Embedded chapters may stay empty where datasets are not mocked.
 
 ## Domo publish
 
