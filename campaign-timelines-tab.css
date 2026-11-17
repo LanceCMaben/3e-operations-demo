@@ -1,0 +1,349 @@
+/* Campaign Timelines chapter — rebuild of Analyzer page 1151828266.
+   Scoped under #campaignTimelinesChapter so hub `.main { display: none }` cannot hide the gantt. */
+
+#campaignTimelinesChapter {
+  --gantt-label-w: 168px;
+  --today: #FFDA0F;
+}
+
+#campaignTimelinesChapter .timelines-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.65rem 1rem;
+  margin-bottom: 0;
+}
+
+#campaignTimelinesChapter .timelines-filters .field-years,
+#campaignTimelinesChapter .timelines-filters .field-scope-campaign {
+  min-width: 220px;
+  flex: 1 1 200px;
+  max-width: 320px;
+}
+
+/* Match Operations gold scope controls (not teal native selects). */
+#campaignTimelinesChapter .timelines-scope-cluster.is-linked-open .field-multi {
+  position: relative;
+  z-index: 1;
+  min-width: 220px;
+  flex: 1 1 220px;
+  max-width: 360px;
+}
+
+#campaignTimelinesChapter .timelines-scope-cluster.is-linked-open .multi-select-menu {
+  position: static;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  margin-top: 0.45rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+#campaignTimelinesChapter .multi-select-option input[type="checkbox"],
+#campaignTimelinesChapter .multi-select-option input[type="radio"] {
+  accent-color: var(--brand-gold, #ffd100);
+}
+
+#campaignTimelinesChapter .multi-select-trigger:focus-visible {
+  outline: 2px solid var(--brand-gold, #ffd100);
+  outline-offset: 2px;
+}
+
+#campaignTimelinesChapter .timelines-filters .field-search {
+  flex: 1 1 180px;
+  max-width: 280px;
+}
+
+#campaignTimelinesChapter .timelines-filters .field-toggle {
+  min-width: 120px;
+}
+
+#campaignTimelinesChapter .pit-toggle {
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.42rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  min-height: 34px;
+}
+
+#campaignTimelinesChapter .pit-toggle.is-active {
+  background: var(--brand-gold);
+  border-color: var(--brand-gold);
+  color: var(--accent-ink);
+}
+
+#campaignTimelinesChapter .legend-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.7rem 1rem;
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 0.65rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+
+#campaignTimelinesChapter .legend-item {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+#campaignTimelinesChapter .legend-item strong {
+  display: block;
+  color: var(--brand-charcoal);
+  font-size: 0.76rem;
+}
+
+#campaignTimelinesChapter .legend-swatch {
+  width: 18px;
+  height: 10px;
+  margin-top: 0.3rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+#campaignTimelinesChapter .legend-swatch.is-start { background: #5BA4C9; }
+#campaignTimelinesChapter .legend-swatch.is-launch { background: var(--brand-gold); }
+#campaignTimelinesChapter .legend-swatch.is-end { background: #6B7178; }
+
+#campaignTimelinesChapter .year-legend {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.85rem;
+  padding-top: 0.15rem;
+  border-top: 1px solid var(--row-border);
+}
+
+#campaignTimelinesChapter .year-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+#campaignTimelinesChapter .year-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+#campaignTimelinesChapter .timelines-panel {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0.65rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  overflow: visible;
+}
+
+#campaignTimelinesChapter .timelines-panel .chart-card-header {
+  display: flex;
+}
+
+#campaignTimelinesChapter .gantt-wrap {
+  position: relative;
+  overflow: auto;
+  max-height: min(68vh, 720px);
+}
+
+#campaignTimelinesChapter .gantt {
+  min-width: 720px;
+  position: relative;
+}
+
+#campaignTimelinesChapter .gantt-axis {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: var(--gantt-label-w) 1fr;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+#campaignTimelinesChapter .gantt-axis-label {
+  padding: 0.45rem 0.7rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-right: 1px solid var(--border);
+}
+
+#campaignTimelinesChapter .gantt-axis-track {
+  position: relative;
+  min-height: 34px;
+}
+
+#campaignTimelinesChapter .gantt-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px dashed var(--border);
+  transform: translateX(-0.5px);
+}
+
+#campaignTimelinesChapter .gantt-tick-label {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+#campaignTimelinesChapter .gantt-row {
+  display: grid;
+  grid-template-columns: var(--gantt-label-w) 1fr;
+  border-bottom: 1px solid var(--row-border);
+}
+
+#campaignTimelinesChapter .gantt-row:hover { background: var(--hover-fill); }
+
+#campaignTimelinesChapter .gantt-client {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  padding: 0.45rem 0.7rem;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--brand-charcoal);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.1rem;
+}
+
+#campaignTimelinesChapter .gantt-row:hover .gantt-client { background: var(--header-bg); }
+
+#campaignTimelinesChapter .gantt-client-count {
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: var(--text-faint);
+}
+
+#campaignTimelinesChapter .gantt-track { position: relative; }
+
+#campaignTimelinesChapter .gantt-bar {
+  position: absolute;
+  height: 14px;
+  border-radius: 7px;
+  min-width: 6px;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+#campaignTimelinesChapter .gantt-bar:hover,
+#campaignTimelinesChapter .gantt-bar:focus-visible {
+  outline: 2px solid var(--brand-gold);
+  outline-offset: 1px;
+  z-index: 2;
+}
+
+#campaignTimelinesChapter .gantt-launch {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  margin-top: -4px;
+  border-radius: 1px;
+  background: var(--brand-gold);
+  transform: rotate(45deg);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  z-index: 2;
+}
+
+#campaignTimelinesChapter .gantt-today {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--today);
+  z-index: 1;
+  pointer-events: none;
+}
+
+#campaignTimelinesChapter .gantt-today-label {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6a5a00;
+  background: var(--brand-gold);
+  padding: 0.05rem 0.28rem;
+  border-radius: 3px;
+}
+
+#campaignTimelinesChapter .gantt-tooltip {
+  position: fixed;
+  z-index: 90;
+  max-width: 280px;
+  padding: 0.55rem 0.7rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(37, 40, 42, 0.18);
+  font-size: 0.74rem;
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+#campaignTimelinesChapter .gantt-tooltip strong {
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+#campaignTimelinesChapter .timelines-panel .table-wrap {
+  overflow-x: auto;
+  overflow-y: auto;
+  min-width: 0;
+  max-height: 360px;
+}
+
+#campaignTimelinesChapter .year-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 600;
+}
+
+#campaignTimelinesChapter .year-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+@media (max-width: 720px) {
+  #campaignTimelinesChapter { --gantt-label-w: 120px; }
+  #campaignTimelinesChapter .gantt { min-width: 560px; }
+}
