@@ -1,0 +1,264 @@
+/* Print Batches chapter — mirrors Print_Batches_On_Demand standalone dashboard.
+   Scoped under #printBatchesChapter so later chapter CSS cannot hide or restyle these tables. */
+
+#printBatchesChapter .print-sticky-chrome {
+  position: sticky;
+  top: 0;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding-bottom: 0.15rem;
+  margin-bottom: 0;
+  background: var(--page-bg);
+}
+
+#printBatchesChapter .print-sticky-chrome:has(.ops-filter-surface .field-multi.is-open) {
+  z-index: 96;
+}
+
+#printBatchesChapter .print-filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.65rem 1rem;
+}
+
+#printBatchesChapter .print-year-field {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+#printBatchesChapter .print-year-field .field-label {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+#printBatchesChapter .year-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+#printBatchesChapter .year-pill {
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.28rem 0.75rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+#printBatchesChapter .year-pill.is-active {
+  background: var(--brand-gold);
+  border-color: var(--brand-gold);
+  color: var(--accent-ink);
+}
+
+#printBatchesChapter .print-chapter-status {
+  margin: 0;
+}
+
+#printBatchesChapter .field-search {
+  flex: 1 1 220px;
+  max-width: 280px;
+}
+
+#printBatchesChapter .field-search label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+#printBatchesChapter .field-search input {
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--text);
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.38rem 0.55rem;
+  min-height: 34px;
+  width: 100%;
+}
+
+#printBatchesChapter .print-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  min-width: 0;
+  max-width: 100%;
+}
+
+#printBatchesChapter .print-card .chart-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 0.85rem 0.95rem 0.35rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--header-bg);
+  overflow: visible;
+}
+
+#printBatchesChapter .print-panel-count {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+#printBatchesChapter .print-card--empty .chart-card-title {
+  color: var(--text-muted);
+}
+
+#printBatchesChapter .print-card--empty .table-wrap {
+  min-height: 4.5rem;
+}
+
+#printBatchesChapter .print-card .chart-card-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--brand-charcoal);
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+#printBatchesChapter .pair-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+#printBatchesChapter .section-head {
+  margin: 1.1rem 0 0.55rem;
+  padding: 0.35rem 0.15rem;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 750;
+  color: var(--brand-charcoal);
+  border-bottom: 2px solid var(--brand-gold);
+}
+
+#printBatchesChapter .table-wrap.compact {
+  min-height: 3.25rem;
+}
+
+#printBatchesChapter .table-wrap,
+#printBatchesChapter .table-wrap.compact {
+  max-height: min(560px, calc(100vh - 16rem));
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+#printBatchesChapter .data-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.78rem;
+}
+
+#printBatchesChapter .data-table th,
+#printBatchesChapter .data-table td {
+  padding: 0.45rem 0.65rem;
+  border-bottom: 1px solid var(--row-border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+#printBatchesChapter .data-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--brand-gold);
+  color: var(--accent-ink);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  border-bottom: 1px solid var(--row-border);
+}
+
+#printBatchesChapter .data-table td.num,
+#printBatchesChapter .data-table th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#printBatchesChapter .data-table tbody tr:hover td {
+  background: var(--hover-fill);
+}
+
+#printBatchesChapter .data-table td.bar-cell {
+  position: relative;
+}
+
+#printBatchesChapter .bar-fill {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  right: 0;
+  border-radius: 3px;
+}
+
+#printBatchesChapter .bar-fill--avail {
+  background: rgba(255, 218, 15, 0.55);
+}
+
+#printBatchesChapter .bar-fill--sent {
+  background: rgba(163, 214, 213, 0.55);
+}
+
+html[data-theme="dark"] #printBatchesChapter .bar-fill--avail {
+  background: rgba(255, 218, 15, 0.28);
+}
+
+html[data-theme="dark"] #printBatchesChapter .bar-fill--sent {
+  background: rgba(163, 214, 213, 0.24);
+}
+
+#printBatchesChapter .bar-value {
+  position: relative;
+  font-variant-numeric: tabular-nums;
+}
+
+#printBatchesChapter .table-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.95rem 0.65rem;
+  border-top: 1px solid var(--border);
+  background: var(--header-bg);
+}
+
+@media (max-width: 900px) {
+  #printBatchesChapter .pair-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,325 @@
+/* Launch Readiness work queue (hub tiles live in app.css) */
+
+.ops-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 0.65rem;
+}
+
+.ops-kpi-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 0.75rem 0.85rem;
+  border-left: 3px solid var(--brand-teal);
+}
+
+.ops-kpi-card--warn {
+  border-left-color: var(--brand-gold);
+}
+
+.ops-kpi-card--bad {
+  border-left-color: #c0392b;
+}
+
+.ops-kpi-label {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.ops-kpi-value {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--brand-charcoal);
+  line-height: 1.1;
+}
+
+.ops-kpi-note {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.ops-funnel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+
+.ops-funnel-step {
+  flex: 1 1 7rem;
+  min-width: 6.5rem;
+  text-align: center;
+  padding: 0.35rem 0.25rem;
+}
+
+.ops-funnel-step strong {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--brand-charcoal);
+}
+
+.ops-funnel-step span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+  line-height: 1.3;
+}
+
+.ops-funnel-arrow {
+  align-self: center;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  opacity: 0.55;
+  flex: 0 0 auto;
+}
+
+.ops-heatmap-panel {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 0.75rem 0.85rem 0.85rem;
+  overflow-x: auto;
+}
+
+.ops-heatmap-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.88rem;
+  font-weight: 750;
+  color: var(--brand-charcoal);
+}
+
+.ops-heatmap-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.ops-heatmap-table th,
+.ops-heatmap-table td {
+  padding: 0.35rem 0.45rem;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.ops-heatmap-table th:first-child,
+.ops-heatmap-table td:first-child {
+  text-align: left;
+  font-weight: 650;
+  max-width: 11rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ops-heat {
+  display: inline-block;
+  min-width: 2.1rem;
+  padding: 0.12rem 0.35rem;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.72rem;
+}
+
+.ops-heat--ok {
+  background: rgba(46, 125, 50, 0.14);
+  color: #2e7d32;
+}
+
+.ops-heat--warn {
+  background: rgba(255, 209, 0, 0.22);
+  color: #8a6d00;
+}
+
+.ops-heat--bad {
+  background: rgba(192, 57, 43, 0.12);
+  color: #c0392b;
+}
+
+.ops-heat--na {
+  background: var(--hover-fill);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.ops-heatmap-empty {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+#workQueueChapter .lr-queue-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.65rem 1rem;
+  margin: 0 0 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.field-queue-severity {
+  min-width: 150px;
+}
+
+.queue-severity-select {
+  width: 100%;
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--text);
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.38rem 0.55rem;
+  min-height: 34px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.queue-severity-select:hover {
+  border-color: rgba(118, 184, 177, 0.45);
+}
+
+.queue-severity-select:focus {
+  outline: none;
+  border-color: var(--brand-teal);
+  box-shadow: 0 0 0 3px rgba(118, 184, 177, 0.25);
+}
+
+#workQueueChapter .ops-queue-panel {
+  margin-bottom: 1rem;
+}
+
+#workQueueChapter .lr-queue-header {
+  border-bottom: 1px solid var(--row-border);
+}
+
+#workQueueChapter .lr-queue-header-text {
+  min-width: 0;
+  flex: 1;
+}
+
+#workQueueChapter .lr-queue-title.chart-card-title::after {
+  display: none;
+}
+
+#workQueueChapter .lr-queue-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+#workQueueChapter .lr-queue-meta--standalone {
+  margin: 0;
+  padding: 0.55rem 0.95rem 0.45rem;
+  border-bottom: 1px solid var(--row-border);
+  background: color-mix(in srgb, var(--brand-teal) 6%, var(--surface));
+}
+
+#workQueueChapter .lr-queue-table .lr-col-issue {
+  white-space: normal;
+  min-width: 12rem;
+  max-width: 36rem;
+}
+
+#workQueueChapter .lr-queue-table .lr-col-priority {
+  width: 5.5rem;
+}
+
+#workQueueChapter .lr-queue-table .lr-col-action {
+  text-align: right;
+  width: 4.5rem;
+}
+
+#workQueueChapter .lr-queue-table tr.lr-queue-empty td {
+  padding: 1.25rem 0.65rem;
+  color: var(--text-muted);
+  white-space: normal;
+  text-align: center;
+}
+
+.ops-queue-sev {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.ops-queue-sev--high {
+  background: rgba(192, 57, 43, 0.12);
+  color: #c0392b;
+}
+
+.ops-queue-sev--medium {
+  background: rgba(255, 209, 0, 0.22);
+  color: #8a6d00;
+}
+
+.ops-queue-sev--low {
+  background: var(--hover-fill);
+  color: var(--text-muted);
+}
+
+.ops-queue-action {
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--brand-teal);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.ops-exceptions-foot {
+  margin-top: 0.85rem;
+}
+
+.ops-exceptions-details {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.ops-exceptions-details summary {
+  cursor: pointer;
+  font-weight: 650;
+  color: var(--brand-charcoal);
+  padding: 0.35rem 0;
+}
+
+.ops-exceptions-note {
+  margin: 0.35rem 0 0;
+}
+
+.ops-exceptions-list {
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.ops-cc-loading {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+}

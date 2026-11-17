@@ -1,0 +1,142 @@
+{
+  "name": "DEV 3E Operations",
+  "version": "0.0.275",
+  "datasetsMapping": [
+    {
+      "dataSetId": "59afa2d3-bbd8-4ed8-9e1c-c474f6fe7c46",
+      "alias": "programs",
+      "fields": [],
+      "dql": null
+    },
+    {
+      "dataSetId": "79b16d1a-be4d-441d-a6ec-619156b764cf",
+      "alias": "partnerFiles",
+      "fields": [],
+      "dql": null
+    },
+    {
+      "dataSetId": "422fec3e-c1f1-4e9d-baba-2e8365cb6289",
+      "alias": "downloads",
+      "fields": [
+        {
+          "alias": "EVENT_DATE",
+          "columnName": "EVENT_DATE"
+        },
+        {
+          "alias": "DOWNLOAD_DATE",
+          "columnName": "DOWNLOAD_DATE"
+        },
+        {
+          "alias": "CLIENT",
+          "columnName": "CLIENT"
+        },
+        {
+          "alias": "PARTITION",
+          "columnName": "PARTITION"
+        },
+        {
+          "alias": "PARTNER",
+          "columnName": "PARTNER"
+        },
+        {
+          "alias": "CAMPAIGN",
+          "columnName": "CAMPAIGN"
+        },
+        {
+          "alias": "PROGRAM_SOLUTION",
+          "columnName": "PROGRAM_SOLUTION"
+        },
+        {
+          "alias": "CY",
+          "columnName": "CY"
+        },
+        {
+          "alias": "CAMPAIGN_YEAR",
+          "columnName": "CAMPAIGN_YEAR"
+        },
+        {
+          "alias": "FILE_NAME",
+          "columnName": "FILE_NAME"
+        },
+        {
+          "alias": "FILE_PATH",
+          "columnName": "FILE_PATH"
+        }
+      ],
+      "dql": null
+    },
+    {
+      "dataSetId": "cf232f03-3941-4bfe-b4c6-8e5709c6c1a2",
+      "alias": "loadHistory",
+      "fields": [],
+      "dql": null
+    },
+    {
+      "dataSetId": "e4871332-8b50-4d6a-8021-dcb29669f5b8",
+      "alias": "leads",
+      "fields": [],
+      "dql": null
+    },
+    {
+      "dataSetId": "9100cf4b-7aa4-46be-b055-a59cb46e70db",
+      "alias": "printBatches",
+      "fields": [
+        {
+          "alias": "PARTITION",
+          "columnName": "PARTITION"
+        },
+        {
+          "alias": "PROGRAM_SOLUTION",
+          "columnName": "PROGRAM_SOLUTION"
+        },
+        {
+          "alias": "CAMPAIGN_YEAR",
+          "columnName": "CAMPAIGN_YEAR"
+        },
+        {
+          "alias": "SENT_BATCH",
+          "columnName": "SENT_BATCH"
+        },
+        {
+          "alias": "SENT_DEMAND",
+          "columnName": "SENT_DEMAND"
+        },
+        {
+          "alias": "CNV_SCORE",
+          "columnName": "CNV_SCORE"
+        }
+      ],
+      "dql": null
+    },
+    {
+      "dataSetId": "43a17397-6e63-4e9d-9ef6-bbc2217ddac2",
+      "alias": "campaignQaInsights",
+      "fields": [],
+      "dql": null
+    },
+    {
+      "dataSetId": "efa412ee-ca5b-483a-9cf0-f7eca03034ed",
+      "alias": "programMeta",
+      "fields": [],
+      "dql": null
+    },
+    {
+      "dataSetId": "c9aced4a-18bd-43df-aa45-df993c868726",
+      "alias": "emailSkew",
+      "fields": [],
+      "dql": null
+    },
+    {
+      "dataSetId": "dea70a64-b434-4783-80d3-84df858a785c",
+      "alias": "pageViews",
+      "fields": [],
+      "dql": null
+    }
+  ],
+  "size": {
+    "width": 6,
+    "height": 5
+  },
+  "fileName": "manifest.dev.json",
+  "id": "5a5bf3e6-a965-464c-a3e8-b22e313228d7"
+}

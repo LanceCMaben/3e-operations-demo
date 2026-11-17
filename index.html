@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>3E Operations</title>
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('3e-dashboard-theme');
+          var theme = saved;
+          if (theme !== 'light' && theme !== 'dark') {
+            theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+          else document.documentElement.setAttribute('data-theme', 'light');
+        } catch (e) { /* ignore */ }
+      })();
+    </script>
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="campaign-upload-qa-tab.css" />
+    <link rel="stylesheet" href="campaign-timelines-tab.css" />
+    <link rel="stylesheet" href="campaign-load-history-tab.css" />
+    <link rel="stylesheet" href="program-meta-tab.css" />
+    <link rel="stylesheet" href="print-batches-tab.css" />
+    <link rel="stylesheet" href="how-we-build.css" />
+    <link rel="stylesheet" href="insights-portal-usage-tab.css" />
+    <link rel="stylesheet" href="ops-command-center.css" />
+  </head>
+  <body>
+    <div id="exportRoot">
+      <div id="appLoadingOverlay" class="app-loading-overlay" aria-hidden="true" aria-busy="false">
+        <div class="app-loading-overlay-inner">
+          <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          <p class="app-loading-label" id="appLoadingLabel">Loading program activity&hellip;</p>
+        </div>
+      </div>
+
+      <div class="app-body">
+        <header class="page-header">
+          <div>
+            <h1 class="page-title">
+              <span class="page-title-brand" id="appPageTitleBrand">3E Operations</span><span class="page-title-context" id="appPageTitleContext" hidden></span>
+            </h1>
+          </div>
+          <div class="header-controls">
+            <button type="button" id="btnExportChapterReport" class="header-export-report-btn" hidden aria-haspopup="dialog" aria-controls="export-confirm-modal">
+              <span class="header-export-report-btn-icon" aria-hidden="true"></span>
+              Export report
+            </button>
+            <div class="theme-toggle" role="group" aria-label="Color theme">
+              <button type="button" class="theme-toggle-btn" data-theme-set="light" aria-pressed="false">Light</button>
+              <button type="button" class="theme-toggle-btn is-active" data-theme-set="system" aria-pressed="true">System</button>
+              <button type="button" class="theme-toggle-btn" data-theme-set="dark" aria-pressed="false">Dark</button>
+            </div>
+            <button type="button" id="btn-help" class="btn-help" aria-haspopup="dialog" aria-controls="help-modal" aria-label="How to Use 3E Operations" title="How to use this dashboard">
+              <span class="btn-help-mark" aria-hidden="true">?</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="sticky-chrome">
+        <nav class="chapter-nav" aria-label="3E Operations chapters">
+          <button type="button" class="chapter-nav-btn is-active" data-chapter="hub" aria-current="page">Overview</button>
+          <button type="button" class="chapter-nav-btn" data-chapter="partnerDataHealth">Partner Data Health</button>
+          <button type="button" class="chapter-nav-btn" data-chapter="printBatches">Print Batches <span class="chapter-badge" id="chapterBadge-printBatches" hidden></span></button>
+          <button type="button" class="chapter-nav-btn" data-chapter="campaignUploadQa">Campaign Upload QA <span class="chapter-badge" id="chapterBadge-campaignUploadQa" hidden></span></button>
+          <button type="button" class="chapter-nav-btn" data-chapter="campaignTimelines">Campaign Timelines <span class="chapter-badge" id="chapterBadge-campaignTimelines" hidden></span></button>
+          <button type="button" class="chapter-nav-btn" data-chapter="campaignLoadHistory">Campaign Load History <span class="chapter-badge" id="chapterBadge-campaignLoadHistory" hidden></span></button>
+          <button type="button" class="chapter-nav-btn" data-chapter="programMeta">Program Meta <span class="chapter-badge" id="chapterBadge-programMeta" hidden></span></button>
+          <button type="button" class="chapter-nav-btn" data-chapter="insightsActivity">Insights Activity <span class="chapter-badge" id="chapterBadge-insightsActivity" hidden></span></button>
+          <button type="button" class="chapter-nav-btn" data-chapter="howWeBuild">Documentation</button>
+        </nav>
+
+        <div class="hub-scope-stack" id="hubScopeStack">
+        <div class="hub-scope-panel brand-ring-frame" id="hubScopePanel">
+        <div id="inheritedFiltersBar" class="inherited-filters-bar hub-scope-applied-bar" hidden>
+          <p class="hub-scope-applied-kicker">Overview scope</p>
+          <p id="hubScopeAppliedTitle" class="hub-scope-applied-title"></p>
+          <button type="button" id="btnClearHubPartners" class="inherited-filters-clear" hidden>Clear partners</button>
+        </div>
+        <div id="sharedFiltersChrome" class="shared-filters-chrome" hidden>
+          <section class="toolbar filters-bar hub-scope-filters ops-filter-surface" aria-label="Filters">
+            <div class="filters-bar-head">
+            <div class="hub-scope-filter-note">
+              <span class="hub-scope-filter-note-label">Overview scope</span>
+              <span class="filters-scope-info" tabindex="0">
+                <span class="filters-scope-info-icon" aria-hidden="true">i</span>
+                <span class="filters-scope-info-tip" role="tooltip">These filters apply across chapters that use Overview scope (Partner Data Health, Program Meta, Campaign Upload QA, and others). Set Partner, Campaign, and Year once, then open any chapter to compare the same partition.</span>
+              </span>
+            </div>
+            <div class="scope-filter-cluster" id="pdhScopeFilterCluster">
+            <div class="field field-multi">
+              <span class="field-label" id="partnerLabel">Partner</span>
+              <div class="multi-select" id="partnerMulti">
+                <button type="button" class="multi-select-trigger" id="partnerTrigger" aria-expanded="false" aria-controls="partnerMenu" aria-labelledby="partnerLabel">
+                  <span id="partnerTriggerLabel">All partners</span>
+                  <span class="multi-select-caret" aria-hidden="true"></span>
+                </button>
+                <div class="multi-select-menu" id="partnerMenu" hidden role="group" aria-label="Partners"></div>
+              </div>
+            </div>
+            <div class="field field-multi">
+              <span class="field-label" id="campaignLabel">Campaign</span>
+              <div class="multi-select" id="campaignMulti">
+                <button type="button" class="multi-select-trigger" id="campaignTrigger" aria-expanded="false" aria-controls="campaignMenu" aria-labelledby="campaignLabel">
+                  <span id="campaignTriggerLabel">All campaigns</span>
+                  <span class="multi-select-caret" aria-hidden="true"></span>
+                </button>
+                <div class="multi-select-menu" id="campaignMenu" hidden role="group" aria-label="Campaigns"></div>
+              </div>
+            </div>
+            <div class="field field-multi">
+              <span class="field-label" id="yearLabel">Campaign Year</span>
+              <div class="multi-select" id="yearMulti">
+                <button type="button" class="multi-select-trigger" id="yearTrigger" aria-expanded="false" aria-controls="yearMenu" aria-labelledby="yearLabel">
+                  <span id="yearTriggerLabel">All years</span>
+                  <span class="multi-select-caret" aria-hidden="true"></span>
+                </button>
+                <div class="multi-select-menu" id="yearMenu" hidden role="group" aria-label="Campaign years"></div>
+              </div>
+            </div>
+            </div>
+            <div class="filters-bar-suffix">
+            <div class="field field-multi">
+              <span class="field-label" id="statusLabel">Program Status</span>
+              <div class="multi-select" id="statusMulti">
+                <button type="button" class="multi-select-trigger" id="statusTrigger" aria-expanded="false" aria-controls="statusMenu" aria-labelledby="statusLabel">
+                  <span id="statusTriggerLabel">All statuses</span>
+                  <span class="multi-select-caret" aria-hidden="true"></span>
+                </button>
+                <div class="multi-select-menu" id="statusMenu" hidden role="group" aria-label="Program status"></div>
+              </div>
+            </div>
+            <div class="field field-filter-actions">
+              <button type="button" id="btnResetFilters" class="pdh-filter-btn pdh-filter-btn--reset">Reset</button>
+              <button type="button" id="btnApplyFilters" class="pdh-filter-btn pdh-filter-btn--apply">Apply</button>
+            </div>
+            </div>
+            </div>
+          </section>
+        </div>
+        </div>
+        </div>
+
+        <section class="chapter-view chapter-theme--hub is-active" id="hubChapter" data-chapter="hub" aria-label="Operations Overview">
+          <div class="hub-intro">
+            <h2 class="hub-intro-title">Overview</h2>
+            <p class="hub-intro-desc">Set Partner, Campaign, and Year above, then open a chapter. That scope carries into Partner Data Health, Upload QA, Program Meta, Timelines, Load History, and Print Batches. Insights Activity keeps its own filters.</p>
+          </div>
+          <div class="hub-grid" id="hubGrid">
+            <article class="hub-card" data-chapter="partnerDataHealth" tabindex="0" role="button">
+              <div class="hub-card-inner">
+                <h3 class="hub-card-title">Partner Data Health</h3>
+              </div>
+            </article>
+            <article class="hub-card" data-chapter="printBatches" tabindex="0" role="button">
+              <div class="hub-card-inner">
+                <h3 class="hub-card-title">Print Batches</h3>
+              </div>
+            </article>
+            <article class="hub-card" data-chapter="campaignUploadQa" tabindex="0" role="button">
+              <div class="hub-card-inner">
+                <h3 class="hub-card-title">Campaign Upload QA</h3>
+              </div>
+            </article>
+            <article class="hub-card" data-chapter="campaignTimelines" tabindex="0" role="button">
+              <div class="hub-card-inner">
+                <h3 class="hub-card-title">Campaign Timelines</h3>
+              </div>
+            </article>
+            <article class="hub-card" data-chapter="campaignLoadHistory" tabindex="0" role="button">
+              <div class="hub-card-inner">
+                <h3 class="hub-card-title">Campaign Load History</h3>
+              </div>
+            </article>
+            <article class="hub-card" data-chapter="programMeta" tabindex="0" role="button">
+              <div class="hub-card-inner">
+                <h3 class="hub-card-title">Program Meta</h3>
+              </div>
+            </article>
+            <article class="hub-card" data-chapter="insightsActivity" tabindex="0" role="button">
+              <div class="hub-card-inner">
+                <h3 class="hub-card-title">Insights Activity</h3>
+              </div>
+            </article>
+            <article class="hub-card" data-chapter="howWeBuild" tabindex="0" role="button">
+              <div class="hub-card-inner">
+                <h3 class="hub-card-title">Documentation</h3>
+              </div>
+            </article>
+            <article class="hub-card" data-chapter="workQueue" tabindex="0" hidden aria-hidden="true">
+              <div class="hub-card-popover" role="tooltip">Merged work queue: stale activity, upload QA, program meta gaps, print still available, and dashboards with no recent client portal views.</div>
+              <div class="hub-card-inner">
+                <h3 class="hub-card-title">Launch Readiness<span class="hub-card-badge" id="hubStat-workQueue" hidden></span></h3>
+                <p class="hub-card-tagline">What needs attention</p>
+                <button type="button" class="hub-card-btn" data-chapter="workQueue">Open</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="chapter-view chapter-theme--workQueue" id="workQueueChapter" data-chapter="workQueue" hidden aria-label="Launch Readiness">
+          <p class="visually-hidden">Open items for your Overview scope. Set Priority in the filter bar; export the queue from Export report in the page header.</p>
+          <div class="chapter-wip-banner" role="status" aria-label="Launch Readiness not ready for use">
+            <div class="chapter-wip-banner-icon" aria-hidden="true"></div>
+            <div class="chapter-wip-banner-body">
+              <p class="chapter-wip-banner-kicker">In progress</p>
+              <p class="chapter-wip-banner-title">Not ready for production use</p>
+              <p class="chapter-wip-banner-text">Launch Readiness is still being built and is not reliable for decisions yet. Use Partner Data Health and Campaign Upload QA until this banner is removed.</p>
+            </div>
+          </div>
+          <div class="chapter-wip-content" aria-hidden="false">
+          <div class="lr-queue-filter-row" id="workQueueFilterChrome">
+            <div class="field field-queue-severity" id="workQueueSeverityField">
+              <label class="field-label" for="queueSeveritySelect">Priority</label>
+              <select id="queueSeveritySelect" class="queue-severity-select">
+                <option value="all">All priorities</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+          </div>
+          <section class="main table-panel is-active ops-queue-panel" aria-label="Launch Readiness work queue">
+            <p class="lr-queue-meta lr-queue-meta--standalone" id="opsQueueMeta" role="status" aria-live="polite">Loading…</p>
+            <div class="table-wrap">
+              <table class="data-table lr-queue-table" id="opsQueueTable">
+                <thead>
+                  <tr>
+                    <th scope="col" class="lr-col-priority">Priority</th>
+                    <th scope="col">Partner</th>
+                    <th scope="col">Campaign · Year</th>
+                    <th scope="col" class="lr-col-issue">Issue</th>
+                    <th scope="col" class="lr-col-action">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="opsQueueBody"></tbody>
+              </table>
+            </div>
+            <div id="opsExceptionsPanel" class="ops-exceptions-foot"></div>
+          </section>
+          </div>
+        </section>
+
+        <div class="chapter-view chapter-theme--partnerDataHealth" id="partnerDataHealthChapter" data-chapter="partnerDataHealth" hidden>
+          <p class="visually-hidden">Operational tables for program activity, partner files, downloads, daily load, and campaign totals.</p>
+
+        <section class="main table-panel is-active" id="activityPanel" data-panel="activity" aria-label="Program Activity">
+          <div class="chart-card-header">
+            <div>
+              <h2 class="chart-card-title">Program Activity</h2>
+              <p class="chart-card-subtitle" id="activitySubtitle">Campaign status, first/last activity, and days since last touched — click a row for details</p>
+            </div>
+            <button type="button" class="detail-export-btn table-export-btn" data-export-table="activity" disabled>Export table</button>
+          </div>
+          <div class="panel-skeleton" id="activitySkeleton" hidden>
+            <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+          <div class="table-wrap" id="activityTableWrap">
+            <table class="data-table" id="activityTable">
+              <thead id="activityHead"></thead>
+              <tbody id="activityBody"></tbody>
+            </table>
+            <p id="activityEmpty" class="panel-empty" hidden>No program activity rows for the current filters.</p>
+          </div>
+          <div class="table-pager" id="activityPager" hidden>
+            <span class="pager-meta" id="activityPagerMeta"></span>
+            <div class="pager-btns">
+              <button type="button" class="pager-btn" data-page-table="activity" data-page-dir="prev">Previous</button>
+              <button type="button" class="pager-btn" data-page-table="activity" data-page-dir="next">Next</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="main table-panel is-active" id="filesPanel" data-panel="files" aria-label="Partner Data Files Detail">
+          <div class="chart-card-header">
+            <div>
+              <h2 class="chart-card-title">Partner Data Files Detail</h2>
+              <p class="chart-card-subtitle" id="filesSubtitle">Funnel counts from the latest partner source files — click a row for details</p>
+            </div>
+            <button type="button" class="detail-export-btn table-export-btn" data-export-table="files" disabled>Export table</button>
+          </div>
+          <div class="panel-skeleton" id="filesSkeleton" hidden>
+            <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+          <div class="table-wrap" id="filesTableWrap">
+            <table class="data-table freeze-2" id="filesTable">
+              <thead id="filesHead"></thead>
+              <tbody id="filesBody"></tbody>
+            </table>
+            <p id="filesEmpty" class="panel-empty" hidden>No partner file rows for the current filters.</p>
+          </div>
+          <div class="table-pager" id="filesPager" hidden>
+            <span class="pager-meta" id="filesPagerMeta"></span>
+            <div class="pager-btns">
+              <button type="button" class="pager-btn" data-page-table="files" data-page-dir="prev">Previous</button>
+              <button type="button" class="pager-btn" data-page-table="files" data-page-dir="next">Next</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="main table-panel is-active" id="downloadsPanel" data-panel="downloads" aria-label="Partner Downloads">
+          <div class="chart-card-header">
+            <div>
+              <h2 class="chart-card-title">Partner Downloads</h2>
+              <p class="chart-card-subtitle" id="downloadsSubtitle">Partner file download events — click a row for details</p>
+            </div>
+            <button type="button" class="detail-export-btn table-export-btn" data-export-table="downloads" disabled>Export table</button>
+          </div>
+          <div class="panel-skeleton" id="downloadsSkeleton" hidden>
+            <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+          <div class="table-wrap" id="downloadsTableWrap">
+            <table class="data-table" id="downloadsTable">
+              <thead id="downloadsHead"></thead>
+              <tbody id="downloadsBody"></tbody>
+            </table>
+            <p id="downloadsEmpty" class="panel-empty" hidden>No download rows for the current filters.</p>
+          </div>
+          <div class="table-pager" id="downloadsPager" hidden>
+            <span class="pager-meta" id="downloadsPagerMeta"></span>
+            <div class="pager-btns">
+              <button type="button" class="pager-btn" data-page-table="downloads" data-page-dir="prev">Previous</button>
+              <button type="button" class="pager-btn" data-page-table="downloads" data-page-dir="next">Next</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="main table-panel is-active" id="loadPanel" data-panel="load" aria-label="Daily Load Details">
+          <div class="chart-card-header">
+            <div>
+              <h2 class="chart-card-title">Daily Load Details</h2>
+              <p class="chart-card-subtitle" id="loadSubtitle">Daily membership load with a running total — click a row for details</p>
+            </div>
+            <button type="button" class="detail-export-btn table-export-btn" data-export-table="load" disabled>Export table</button>
+          </div>
+          <div class="panel-skeleton" id="loadSkeleton" hidden>
+            <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+          <div class="table-wrap" id="loadTableWrap">
+            <table class="data-table" id="loadTable">
+              <thead id="loadHead"></thead>
+              <tbody id="loadBody"></tbody>
+            </table>
+            <p id="loadEmpty" class="panel-empty" hidden>No daily load rows for the current filters.</p>
+          </div>
+          <div class="table-pager" id="loadPager" hidden>
+            <span class="pager-meta" id="loadPagerMeta"></span>
+            <div class="pager-btns">
+              <button type="button" class="pager-btn" data-page-table="load" data-page-dir="prev">Previous</button>
+              <button type="button" class="pager-btn" data-page-table="load" data-page-dir="next">Next</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="main table-panel is-active" id="totalsPanel" data-panel="totals" aria-label="Campaign Totals">
+          <div class="chart-card-header">
+            <div>
+              <h2 class="chart-card-title">Campaign Totals</h2>
+              <p class="chart-card-subtitle" id="totalsSubtitle">Record counts from leads_programs_xpl — click a row for details</p>
+            </div>
+            <button type="button" class="detail-export-btn table-export-btn" data-export-table="totals" disabled>Export table</button>
+          </div>
+          <div class="panel-skeleton" id="totalsSkeleton" hidden>
+            <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+          <div class="table-wrap" id="totalsTableWrap">
+            <table class="data-table" id="totalsTable">
+              <thead id="totalsHead"></thead>
+              <tbody id="totalsBody"></tbody>
+            </table>
+            <p id="totalsEmpty" class="panel-empty" hidden>No campaign total rows for the current filters.</p>
+          </div>
+          <div class="table-pager" id="totalsPager" hidden>
+            <span class="pager-meta" id="totalsPagerMeta"></span>
+            <div class="pager-btns">
+              <button type="button" class="pager-btn" data-page-table="totals" data-page-dir="prev">Previous</button>
+              <button type="button" class="pager-btn" data-page-table="totals" data-page-dir="next">Next</button>
+            </div>
+          </div>
+        </section>
+        </div>
+
+        <div class="chapter-view chapter-theme--printBatches" id="printBatchesChapter" data-chapter="printBatches" hidden>
+          <p class="visually-hidden">On-demand and batch print status from PRINT_BATCHES — available vs sent by client and campaign year.</p>
+        <section class="print-batches-panel" id="printBatchesPanel" data-panel="printBatches">
+          <div class="panel-skeleton" id="printBatchesSkeleton" hidden>
+            <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+
+          <div class="print-sticky-chrome">
+            <section class="toolbar filters-bar print-filters-bar ops-filter-surface" aria-label="Print batch filters">
+              <div class="field print-year-field">
+                <span class="field-label">Campaign Year</span>
+                <div id="printYearPills" class="year-pills" role="radiogroup" aria-label="Campaign year"></div>
+              </div>
+              <div class="field field-search">
+                <label for="printSearchFilter">Search</label>
+                <input type="search" id="printSearchFilter" placeholder="Client or campaign…" autocomplete="off" />
+              </div>
+            </section>
+
+            <div id="printChapterStatus" class="status-bar print-chapter-status" role="status" aria-live="polite"></div>
+          </div>
+
+          <h2 class="section-head">On Demand</h2>
+          <div class="pair-grid">
+            <section class="print-card" id="cnvaOdAvailPanel">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">CNVA Available for On-Demand</h2><p class="chart-card-subtitle">CNVA engagement score 8+</p></div></div>
+              <div class="table-wrap compact"><table class="data-table" id="cnvaOdAvailTable"><thead></thead><tbody></tbody></table><p class="panel-empty" id="cnvaOdAvailEmpty" hidden>No rows for the current filters.</p></div>
+              <div class="table-pager" id="cnvaOdAvailPager" hidden><span class="pager-meta"></span><div class="pager-btns"><button type="button" class="pager-btn" data-page-table="cnvaOdAvail" data-page-dir="prev">Previous</button><button type="button" class="pager-btn" data-page-table="cnvaOdAvail" data-page-dir="next">Next</button></div></div>
+            </section>
+            <section class="print-card" id="cnvaOdSentPanel">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">CNVA On-Demand Sent</h2><p class="chart-card-subtitle">SENT_DEMAND</p></div></div>
+              <div class="table-wrap compact"><table class="data-table" id="cnvaOdSentTable"><thead></thead><tbody></tbody></table><p class="panel-empty" id="cnvaOdSentEmpty" hidden>No rows for the current filters.</p></div>
+              <div class="table-pager" id="cnvaOdSentPager" hidden><span class="pager-meta"></span><div class="pager-btns"><button type="button" class="pager-btn" data-page-table="cnvaOdSent" data-page-dir="prev">Previous</button><button type="button" class="pager-btn" data-page-table="cnvaOdSent" data-page-dir="next">Next</button></div></div>
+            </section>
+          </div>
+
+          <h2 class="section-head">Batch</h2>
+          <div class="pair-grid">
+            <section class="print-card" id="cnvaBatchAvailPanel">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">CNVA Available for Print Batches</h2><p class="chart-card-subtitle">Not yet SENT_BATCH</p></div></div>
+              <div class="table-wrap compact"><table class="data-table" id="cnvaBatchAvailTable"><thead></thead><tbody></tbody></table><p class="panel-empty" id="cnvaBatchAvailEmpty" hidden>No rows for the current filters.</p></div>
+              <div class="table-pager" id="cnvaBatchAvailPager" hidden><span class="pager-meta"></span><div class="pager-btns"><button type="button" class="pager-btn" data-page-table="cnvaBatchAvail" data-page-dir="prev">Previous</button><button type="button" class="pager-btn" data-page-table="cnvaBatchAvail" data-page-dir="next">Next</button></div></div>
+            </section>
+            <section class="print-card" id="cnvaBatchSentPanel">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">CNVA Sent Print Batches</h2><p class="chart-card-subtitle">SENT_BATCH</p></div></div>
+              <div class="table-wrap compact"><table class="data-table" id="cnvaBatchSentTable"><thead></thead><tbody></tbody></table><p class="panel-empty" id="cnvaBatchSentEmpty" hidden>No rows for the current filters.</p></div>
+              <div class="table-pager" id="cnvaBatchSentPager" hidden><span class="pager-meta"></span><div class="pager-btns"><button type="button" class="pager-btn" data-page-table="cnvaBatchSent" data-page-dir="prev">Previous</button><button type="button" class="pager-btn" data-page-table="cnvaBatchSent" data-page-dir="next">Next</button></div></div>
+            </section>
+          </div>
+          <div class="pair-grid">
+            <section class="print-card" id="awrBatchAvailPanel">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">AWR/AWRSS Available for Print Batches</h2><p class="chart-card-subtitle">AWR and AWRSS, not yet SENT_BATCH</p></div></div>
+              <div class="table-wrap compact"><table class="data-table" id="awrBatchAvailTable"><thead></thead><tbody></tbody></table><p class="panel-empty" id="awrBatchAvailEmpty" hidden>No rows for the current filters.</p></div>
+              <div class="table-pager" id="awrBatchAvailPager" hidden><span class="pager-meta"></span><div class="pager-btns"><button type="button" class="pager-btn" data-page-table="awrBatchAvail" data-page-dir="prev">Previous</button><button type="button" class="pager-btn" data-page-table="awrBatchAvail" data-page-dir="next">Next</button></div></div>
+            </section>
+            <section class="print-card" id="awrBatchSentPanel">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">AWR Sent Print Batches</h2><p class="chart-card-subtitle">AWR and AWRSS, SENT_BATCH</p></div></div>
+              <div class="table-wrap compact"><table class="data-table" id="awrBatchSentTable"><thead></thead><tbody></tbody></table><p class="panel-empty" id="awrBatchSentEmpty" hidden>No rows for the current filters.</p></div>
+              <div class="table-pager" id="awrBatchSentPager" hidden><span class="pager-meta"></span><div class="pager-btns"><button type="button" class="pager-btn" data-page-table="awrBatchSent" data-page-dir="prev">Previous</button><button type="button" class="pager-btn" data-page-table="awrBatchSent" data-page-dir="next">Next</button></div></div>
+            </section>
+          </div>
+          <div class="pair-grid">
+            <section class="print-card" id="cnvdOdAvailPanel">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">CNVD Available for Print on Demand</h2><p class="chart-card-subtitle">Not yet SENT_DEMAND</p></div></div>
+              <div class="table-wrap compact"><table class="data-table" id="cnvdOdAvailTable"><thead></thead><tbody></tbody></table><p class="panel-empty" id="cnvdOdAvailEmpty" hidden>No rows for the current filters.</p></div>
+              <div class="table-pager" id="cnvdOdAvailPager" hidden><span class="pager-meta"></span><div class="pager-btns"><button type="button" class="pager-btn" data-page-table="cnvdOdAvail" data-page-dir="prev">Previous</button><button type="button" class="pager-btn" data-page-table="cnvdOdAvail" data-page-dir="next">Next</button></div></div>
+            </section>
+            <section class="print-card" id="cnvdOdSentPanel">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">CNVD Sent Print on Demand</h2><p class="chart-card-subtitle">SENT_DEMAND</p></div></div>
+              <div class="table-wrap compact"><table class="data-table" id="cnvdOdSentTable"><thead></thead><tbody></tbody></table><p class="panel-empty" id="cnvdOdSentEmpty" hidden>No rows for the current filters.</p></div>
+              <div class="table-pager" id="cnvdOdSentPager" hidden><span class="pager-meta"></span><div class="pager-btns"><button type="button" class="pager-btn" data-page-table="cnvdOdSent" data-page-dir="prev">Previous</button><button type="button" class="pager-btn" data-page-table="cnvdOdSent" data-page-dir="next">Next</button></div></div>
+            </section>
+          </div>
+          <div class="pair-grid">
+            <section class="print-card" id="cnvascBatchAvailPanel">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">CNVASC Available for Print Batches</h2><p class="chart-card-subtitle">Not yet SENT_BATCH</p></div></div>
+              <div class="table-wrap compact"><table class="data-table" id="cnvascBatchAvailTable"><thead></thead><tbody></tbody></table><p class="panel-empty" id="cnvascBatchAvailEmpty" hidden>No rows for the current filters.</p></div>
+              <div class="table-pager" id="cnvascBatchAvailPager" hidden><span class="pager-meta"></span><div class="pager-btns"><button type="button" class="pager-btn" data-page-table="cnvascBatchAvail" data-page-dir="prev">Previous</button><button type="button" class="pager-btn" data-page-table="cnvascBatchAvail" data-page-dir="next">Next</button></div></div>
+            </section>
+            <section class="print-card" id="cnvascBatchSentPanel">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">CNVASC Sent Print Batches</h2><p class="chart-card-subtitle">SENT_BATCH</p></div></div>
+              <div class="table-wrap compact"><table class="data-table" id="cnvascBatchSentTable"><thead></thead><tbody></tbody></table><p class="panel-empty" id="cnvascBatchSentEmpty" hidden>No rows for the current filters.</p></div>
+              <div class="table-pager" id="cnvascBatchSentPager" hidden><span class="pager-meta"></span><div class="pager-btns"><button type="button" class="pager-btn" data-page-table="cnvascBatchSent" data-page-dir="prev">Previous</button><button type="button" class="pager-btn" data-page-table="cnvascBatchSent" data-page-dir="next">Next</button></div></div>
+            </section>
+          </div>
+        </section>
+        </div>
+
+        <div class="chapter-view chapter-theme--campaignUploadQa" id="campaignUploadQaChapter" data-chapter="campaignUploadQa" hidden>
+          <p class="visually-hidden">Partition upload freshness from Enrollment Metrics. Click a roster row for client details. Year pills CY25 and CY26.</p>
+          <div class="panel-skeleton" id="campaignUploadQaSkeleton" hidden>
+            <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+
+          <div id="app" class="cqa-embed-app">
+            <div class="filter-bar-wrap">
+              <div class="filter-bar">
+                <div class="filter-bar-date">
+                  <span class="filter-date-value" id="filter-bar-year-label">Year:</span>
+                  <div class="qa-year-pills" id="qa-year-pills" role="radiogroup" aria-label="Campaign year"></div>
+                  <span class="filter-date-value" id="filter-bar-date-label">Campaigns:</span>
+                  <div class="program-tabs" role="tablist" aria-label="Program">
+                    <button type="button" class="program-tab active" role="tab" id="tab-all" data-program-tab="all" aria-selected="true">
+                      <span class="program-tab-label">All</span>
+                      <span class="program-tab-year">2026–2027</span>
+                    </button>
+                    <button type="button" class="program-tab" role="tab" id="tab-cnva" data-program-tab="cnva" aria-selected="false">
+                      <span class="program-tab-label">CNVA</span>
+                      <span class="program-tab-year">2026–2027</span>
+                    </button>
+                    <button type="button" class="program-tab" role="tab" id="tab-awr" data-program-tab="awr" aria-selected="false">
+                      <span class="program-tab-label">AWR</span>
+                      <span class="program-tab-year">2025–2026</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="status-pill">
+                  <span class="status-dot" aria-hidden="true"></span>
+                  <span class="status-pill-text">Last updated <span id="header-updated-date">—</span></span>
+                </div>
+              </div>
+            </div>
+
+            <div id="dashboard">
+              <main id="content">
+                <div id="qa-diag" class="qa-diag hidden" role="status" hidden></div>
+                <section class="grid-bottom">
+                  <div class="panel panel-geo grid-bottom-geo" data-export-card data-export-key="partition-roster" data-export-title="Partition Uploads">
+                    <div class="panel-head-row">
+                      <div class="box-head">
+                        <span class="box-head-accent" aria-hidden="true"></span>
+                        <div class="box-head-text">
+                          <h2 class="box-title">Partition Uploads</h2>
+                          <p class="box-subtitle" id="roster-subtitle">Last file upload by partition and campaign. Click a row for client details.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="qa-toolbar">
+                      <div class="filter-search-wrap qa-toolbar-search">
+                        <svg class="filter-search-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                          <circle cx="6" cy="6" r="4.25" stroke="currentColor" stroke-width="1.25"/>
+                          <path d="M9.25 9.25L12 12" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+                        </svg>
+                        <input type="search" id="roster-search" class="filter-search" placeholder="Search by partition or campaign" autocomplete="off">
+                      </div>
+                      <div class="qa-toolbar-actions">
+                        <p class="qa-toolbar-count" id="roster-count"></p>
+                        <div class="qa-export">
+                          <button type="button" id="btn-export-list" class="qa-export-btn" aria-haspopup="true" aria-expanded="false" aria-controls="export-list-menu">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                              <path d="M8 2.5v7M5.5 7 8 9.5 10.5 7M3 12.5h10" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Export list
+                          </button>
+                          <div id="export-list-menu" class="qa-export-menu" role="menu" hidden>
+                            <button type="button" class="qa-export-action" data-export-scope="all" role="menuitem">All over 10 days</button>
+                            <button type="button" class="qa-export-action" data-export-scope="view" role="menuitem">Current view, over 10 days</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="qa-table-wrap qa-table-wrap--roster">
+                      <table class="qa-table" id="roster-table">
+                        <thead>
+                          <tr>
+                            <th scope="col"><button type="button" class="qa-sort" data-sort="name">Partition</button></th>
+                            <th scope="col"><button type="button" class="qa-sort" data-sort="campaign">Campaign</button></th>
+                            <th scope="col"><button type="button" class="qa-sort" data-sort="date">Last upload</button></th>
+                            <th scope="col" class="qa-col-status">
+                              <div class="qa-col-head">
+                                <button type="button" class="qa-sort" data-sort="status">Status</button>
+                                <button type="button" id="btn-status-weeks" class="qa-col-filter-btn" aria-expanded="false" aria-controls="status-week-pop" aria-haspopup="true" title="Filter by weeks since upload">
+                                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                                    <path d="M1.5 2h9L7 6.5V10l-2-1V6.5L1.5 2z" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/>
+                                  </svg>
+                                  <span class="qa-col-filter-badge hidden" id="status-week-badge"></span>
+                                </button>
+                              </div>
+                              <div id="status-week-pop" class="qa-col-pop" hidden>
+                                <p class="qa-col-pop-title">Weeks Since Upload</p>
+                                <div class="filter-checklist" id="filter-weeks"></div>
+                              </div>
+                            </th>
+                            <th scope="col" class="qa-num"><button type="button" class="qa-sort" data-sort="records">Records</button></th>
+                          </tr>
+                        </thead>
+                        <tbody id="roster-table-body"></tbody>
+                      </table>
+                    </div>
+                  </div>
+                </section>
+              </main>
+            </div>
+          </div>
+        </div>
+
+        <div class="chapter-view chapter-theme--campaignTimelines" id="campaignTimelinesChapter" data-chapter="campaignTimelines" hidden>
+          <p class="visually-hidden">Program first-to-last activity by client. Bars run from FIRST_ACTIVITY through LAST_ACTIVITY, colored by campaign year.</p>
+          <div class="panel-skeleton" id="timelinesSkeleton" hidden>
+            <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+          <section class="toolbar filters-bar timelines-filters ops-filter-surface" aria-label="Timeline filters">
+            <div class="scope-filter-cluster timelines-scope-cluster" id="timelinesScopeFilterCluster">
+            <div class="field field-multi field-years">
+              <span class="field-label" id="timelinesYearsLabel">Campaign Year</span>
+              <div class="multi-select" id="timelinesYearsSelect">
+                <button type="button" class="multi-select-trigger" id="timelinesYearsTrigger" aria-expanded="false" aria-controls="timelinesYearsMenu" aria-labelledby="timelinesYearsLabel">
+                  <span id="timelinesYearsTriggerLabel">Select years…</span>
+                  <span class="multi-select-caret" aria-hidden="true"></span>
+                </button>
+                <div class="multi-select-menu" id="timelinesYearsMenu" hidden role="group" aria-label="Campaign years"></div>
+              </div>
+            </div>
+            <div class="field field-multi field-scope-campaign">
+              <span class="field-label" id="timelinesCampaignLabel">Campaign</span>
+              <div class="multi-select" id="timelinesCampaignSelect">
+                <button type="button" class="multi-select-trigger" id="timelinesCampaignTrigger" aria-expanded="false" aria-controls="timelinesCampaignMenu" aria-labelledby="timelinesCampaignLabel" disabled>
+                  <span id="timelinesCampaignTriggerLabel">All campaigns</span>
+                  <span class="multi-select-caret" aria-hidden="true"></span>
+                </button>
+                <div class="multi-select-menu" id="timelinesCampaignMenu" hidden role="radiogroup" aria-label="Campaign"></div>
+              </div>
+            </div>
+            </div>
+            <div class="field field-search">
+              <label for="timelinesSearchFilter">Search</label>
+              <input type="search" id="timelinesSearchFilter" placeholder="Client or program" autocomplete="off" />
+            </div>
+            <div class="field field-toggle">
+              <span class="field-label">Today</span>
+              <button type="button" id="timelinesTodayToggle" class="pit-toggle is-active" aria-pressed="true">Show today</button>
+            </div>
+          </section>
+          <section class="legend-card" aria-label="Campaign timing">
+            <div class="legend-item"><span class="legend-swatch is-start" aria-hidden="true"></span><div><strong>First activity</strong><span>Bar start — first touch on the program.</span></div></div>
+            <div class="legend-item"><span class="legend-swatch is-launch" aria-hidden="true"></span><div><strong>Dashboard availability</strong><span>Campaign dashboards: first activity + 14 days. Cross-campaign views follow CNVA for the same partner and year.</span></div></div>
+            <div class="legend-item"><span class="legend-swatch is-end" aria-hidden="true"></span><div><strong>Last activity</strong><span>Bar end — most recent program activity.</span></div></div>
+            <div class="year-legend" id="timelinesYearLegend"></div>
+          </section>
+          <section class="timelines-panel">
+            <div class="chart-card-header"><div><h2 class="chart-card-title">Programs Timeline</h2><p class="chart-card-subtitle" id="timelinesChartSubtitle">Open this chapter to load programs…</p></div></div>
+            <div class="gantt-wrap" id="timelinesGanttWrap">
+              <div class="gantt" id="timelinesGantt" hidden></div>
+              <p id="timelinesChartEmpty" class="panel-empty" hidden>No programs for the current filters.</p>
+            </div>
+          </section>
+          <section class="timelines-panel">
+            <div class="chart-card-header"><div><h2 class="chart-card-title">Program Activity</h2><p class="chart-card-subtitle" id="timelinesTableSubtitle">Filtered rows from the timeline</p></div></div>
+            <div class="table-wrap">
+              <table class="data-table" id="timelinesActivityTable">
+                <thead><tr><th>Client</th><th>Program</th><th>Campaign</th><th>Year</th><th>First activity</th><th>Campaign availability</th><th>Last activity</th></tr></thead>
+                <tbody id="timelinesActivityTableBody"></tbody>
+              </table>
+              <p id="timelinesTableEmpty" class="panel-empty" hidden>No rows for the current filters.</p>
+            </div>
+          </section>
+          <div id="timelinesTooltip" class="gantt-tooltip" hidden role="tooltip"></div>
+        </div>
+
+        <div class="chapter-view chapter-theme--campaignLoadHistory" id="campaignLoadHistoryChapter" data-chapter="campaignLoadHistory" hidden>
+          <p class="visually-hidden">Campaign membership load over time from leads_programs_xpl. Client and campaign are required for the chart and load table.</p>
+          <section class="clh-controls-frame brand-ring-frame ops-filter-surface" aria-label="Load history filters">
+            <div class="campaign-filters clh-campaign-filters" aria-label="Membership load filters">
+              <div class="clh-filter-meta">
+                <p class="clh-scope-summary" id="clhScopeSummary">Select a client and campaign to load membership history.</p>
+              </div>
+              <div class="clh-filter-layout" aria-label="Load history filter controls">
+                <div class="clh-scope-filter-grid scope-filter-cluster" id="clhScopeFilterCluster">
+                <div class="field field-multi field-client field-compact">
+                  <span class="field-label" id="clhClientLabel">Client <span class="req">Required</span></span>
+                  <div class="multi-select" id="clhClientMulti">
+                    <button type="button" class="multi-select-trigger is-placeholder" id="clhClientTrigger" aria-expanded="false" aria-controls="clhClientMenu" aria-labelledby="clhClientLabel" disabled>
+                      <span id="clhClientTriggerLabel">Select client…</span>
+                      <span class="multi-select-caret" aria-hidden="true"></span>
+                    </button>
+                    <div class="multi-select-menu" id="clhClientMenu" hidden role="listbox" aria-label="Clients"></div>
+                  </div>
+                  <select id="clhClientSelect" class="visually-hidden" tabindex="-1" aria-hidden="true" disabled><option value="">Select client…</option></select>
+                </div>
+                <div class="field field-multi field-scope-campaign field-compact">
+                  <span class="field-label" id="clhCampaignLabel">Campaign <span class="req">Required</span></span>
+                  <div class="multi-select" id="clhCampaignMulti">
+                    <button type="button" class="multi-select-trigger is-placeholder" id="clhCampaignTrigger" aria-expanded="false" aria-controls="clhCampaignMenu" aria-labelledby="clhCampaignLabel" disabled>
+                      <span id="clhCampaignTriggerLabel">Select campaign…</span>
+                      <span class="multi-select-caret" aria-hidden="true"></span>
+                    </button>
+                    <div class="multi-select-menu" id="clhCampaignMenu" hidden role="listbox" aria-label="Campaigns"></div>
+                  </div>
+                  <select id="clhCampaignSelect" class="visually-hidden" tabindex="-1" aria-hidden="true" disabled><option value="">Select campaign…</option></select>
+                </div>
+                <div class="field field-multi field-years field-compact">
+                  <span class="field-label" id="clhYearsLabel">Included campaign years</span>
+                  <div class="multi-select" id="clhYearsSelect">
+                    <button type="button" class="multi-select-trigger" id="clhYearsTrigger" aria-expanded="false" aria-controls="clhYearsMenu" aria-labelledby="clhYearsLabel">
+                      <span id="clhYearsTriggerLabel">Select years…</span>
+                      <span class="multi-select-caret" aria-hidden="true"></span>
+                    </button>
+                    <div class="multi-select-menu" id="clhYearsMenu" hidden role="group" aria-label="Campaign years"></div>
+                  </div>
+                </div>
+                </div>
+                <div class="clh-filter-divider" aria-hidden="true"></div>
+                <div class="field field-pit field-compact">
+                  <span class="field-label">Show point in time records</span>
+                  <button type="button" id="clhPitToggle" class="pit-toggle is-active" aria-pressed="true">Point in Time Only</button>
+                  <span class="field-hint">Deselect to show all records</span>
+                </div>
+                <div class="field field-multi field-record-type field-compact">
+                  <span class="field-label" id="clhRecordTypeLabel">Record type</span>
+                  <div class="multi-select" id="clhRecordTypeMulti">
+                    <button type="button" class="multi-select-trigger" id="clhRecordTypeTrigger" aria-expanded="false" aria-controls="clhRecordTypeMenu" aria-labelledby="clhRecordTypeLabel">
+                      <span id="clhRecordTypeTriggerLabel">Student</span>
+                      <span class="multi-select-caret" aria-hidden="true"></span>
+                    </button>
+                    <div class="multi-select-menu" id="clhRecordTypeMenu" hidden role="group" aria-label="Record type"></div>
+                  </div>
+                </div>
+                <div class="field field-multi field-origin field-compact">
+                  <span class="field-label" id="clhOriginLabel">Origin segment</span>
+                  <div class="multi-select" id="clhOriginMulti">
+                    <button type="button" class="multi-select-trigger" id="clhOriginTrigger" aria-expanded="false" aria-controls="clhOriginMenu" aria-labelledby="clhOriginLabel">
+                      <span id="clhOriginTriggerLabel">All origins</span>
+                      <span class="multi-select-caret" aria-hidden="true"></span>
+                    </button>
+                    <div class="multi-select-menu" id="clhOriginMenu" hidden role="group" aria-label="Origin segment"></div>
+                  </div>
+                </div>
+                <div class="field field-filter-actions clh-filter-actions">
+                  <button type="button" id="clhBtnApplyFilters" class="pdh-filter-btn pdh-filter-btn--apply">Apply</button>
+                  <button type="button" id="clhBtnResetFilters" class="pdh-filter-btn pdh-filter-btn--reset">Reset</button>
+                </div>
+              </div>
+            </div>
+          </section>
+          <div class="clh-analytics-grid charts-row" id="clhAnalyticsGrid">
+            <div id="clhAnalyticsLoadingOverlay" class="clh-analytics-loading-overlay" hidden aria-busy="false" aria-live="polite">
+              <span class="visually-hidden" id="clhAnalyticsLoadingLabel">Loading membership…</span>
+              <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+            </div>
+            <section class="clh-panel main table-panel clh-panel--chart chart-panel">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">Campaign Membership</h2><p class="chart-card-subtitle" id="clhChartSubtitle">Select a client and campaign</p></div></div>
+              <div class="clh-chart-legend" id="clhYearLegend" aria-label="Series colors by campaign year" hidden></div>
+              <div class="chart-wrap clh-chart-wrap"><canvas id="clhMembershipChart" aria-label="Cumulative campaign membership by year"></canvas><p id="clhChartEmpty" class="panel-empty clh-panel-empty" hidden>No membership data for the current filters.</p></div>
+            </section>
+            <section class="clh-panel main table-panel clh-panel--table">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">Campaign Membership Load Table</h2><p class="chart-card-subtitle" id="clhLoadSubtitle">Select a client and campaign</p></div></div>
+              <div class="table-wrap clh-table-wrap"><table class="data-table" id="clhLoadTable"><thead id="clhLoadTableHead"></thead><tbody id="clhLoadTableBody"></tbody></table><p id="clhLoadEmpty" class="panel-empty clh-panel-empty" hidden>No daily load rows for the current filters.</p></div>
+            </section>
+          </div>
+          <section class="clh-panel main table-panel pit-panel clh-panel--pit">
+            <div class="chart-card-header"><div><h2 class="chart-card-title" id="clhPitTitle">Point in Time Student Records</h2><p class="chart-card-subtitle">Filters do not apply to this table.</p></div><div class="pit-panel-controls"><div class="field field-inline"><label for="clhPitSearch">Search</label><input type="search" id="clhPitSearch" placeholder="Client or campaign" autocomplete="off" /></div><button type="button" id="clhPitExport" class="detail-export-btn table-export-btn" disabled>Export table</button></div></div>
+            <div id="clhPitStatus" class="summary-table-status" role="status" aria-live="polite">Loading point-in-time totals…</div>
+            <div class="table-wrap pit-table-wrap"><table class="data-table pit-table" id="clhPitTable"><thead><tr><th><button type="button" class="sort-btn" data-pit-sort="client" aria-pressed="true">Client</button></th><th><button type="button" class="sort-btn" data-pit-sort="campaign" aria-pressed="false">Campaign</button></th><th id="clhPitColPrior">Prior Year</th><th id="clhPitColCurrent">Current Year</th></tr></thead><tbody id="clhPitTableBody"></tbody></table><p id="clhPitEmpty" class="panel-empty" hidden>No point-in-time student rows available.</p></div>
+          </section>
+        </div>
+
+        <div class="chapter-view chapter-theme--programMeta" id="programMetaChapter" data-chapter="programMeta" hidden>
+          <p class="visually-hidden">Operational status for programs and campaigns from VW_PROGRAM_META — returns, MAP, dashboards, market, print readiness, and email skew.</p>
+          <div class="panel-skeleton" id="pmSkeleton" hidden>
+            <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+          <section class="pm-panel summary-tab-panel ftf-tab-panel" id="pmCampaignView">
+            <div class="pm-controls-frame ops-filter-surface" aria-label="Campaign controls and filters">
+            <p class="visually-hidden" id="pmCampaignSubtitle">Campaign readiness, returns, MAP, dashboards, and market status</p>
+            <div class="campaign-filters" aria-label="Program meta filters">
+              <div class="pm-filter-row pm-filter-row--scope">
+                <div class="pm-scope-filter-grid scope-filter-cluster" id="pmScopeFilterCluster">
+                  <div class="field field-multi field-compact">
+                    <span class="field-label" id="pmPartnerLabel">Partner</span>
+                    <div class="multi-select" id="pmPartnerMulti">
+                      <button type="button" class="multi-select-trigger" id="pmPartnerTrigger" aria-expanded="false" aria-controls="pmPartnerMenu" aria-labelledby="pmPartnerLabel">
+                        <span id="pmPartnerTriggerLabel">All partners</span>
+                        <span class="multi-select-caret" aria-hidden="true"></span>
+                      </button>
+                      <div class="multi-select-menu" id="pmPartnerMenu" hidden role="group" aria-label="Partners"></div>
+                    </div>
+                  </div>
+                  <div class="field field-multi field-compact">
+                    <span class="field-label" id="pmCampaignLabel">Campaign</span>
+                    <div class="multi-select" id="pmCampaignMulti">
+                      <button type="button" class="multi-select-trigger" id="pmCampaignTrigger" aria-expanded="false" aria-controls="pmCampaignMenu" aria-labelledby="pmCampaignLabel">
+                        <span id="pmCampaignTriggerLabel">All campaigns</span>
+                        <span class="multi-select-caret" aria-hidden="true"></span>
+                      </button>
+                      <div class="multi-select-menu" id="pmCampaignMenu" hidden role="group" aria-label="Campaigns"></div>
+                    </div>
+                  </div>
+                  <div class="field field-multi field-compact">
+                    <span class="field-label" id="pmYearLabel">Year</span>
+                    <div class="multi-select" id="pmYearMulti">
+                      <button type="button" class="multi-select-trigger" id="pmYearTrigger" aria-expanded="false" aria-controls="pmYearMenu" aria-labelledby="pmYearLabel">
+                        <span id="pmYearTriggerLabel">All years</span>
+                        <span class="multi-select-caret" aria-hidden="true"></span>
+                      </button>
+                      <div class="multi-select-menu" id="pmYearMenu" hidden role="group" aria-label="Campaign years"></div>
+                    </div>
+                  </div>
+                  <div class="field field-multi field-compact field-status">
+                    <span class="field-label" id="pmStatusLabel">Status</span>
+                    <div class="multi-select" id="pmStatusMulti">
+                      <button type="button" class="multi-select-trigger" id="pmStatusTrigger" aria-expanded="false" aria-controls="pmStatusMenu" aria-labelledby="pmStatusLabel">
+                        <span id="pmStatusTriggerLabel">All statuses</span>
+                        <span class="multi-select-caret" aria-hidden="true"></span>
+                      </button>
+                      <div class="multi-select-menu" id="pmStatusMenu" hidden role="group" aria-label="Program status"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="pm-filter-row pm-filter-row--secondary" id="pmFilterPriorityRow" aria-label="Campaign readiness filters">
+                <div class="pm-filter-secondary-fields">
+                  <div class="field field-search field-compact">
+                    <label for="pmSearchFilter">Search</label>
+                    <input type="search" id="pmSearchFilter" placeholder="Partner, campaign, program ID" autocomplete="off" />
+                  </div>
+                  <div class="field field-multi field-compact field-flag">
+                    <span class="field-label" id="pmReturnsLabel">Returns</span>
+                    <div class="multi-select" id="pmReturnsMulti">
+                      <button type="button" class="multi-select-trigger" id="pmReturnsTrigger" aria-expanded="false" aria-controls="pmReturnsMenu" aria-labelledby="pmReturnsLabel">
+                        <span id="pmReturnsTriggerLabel">Any</span>
+                        <span class="multi-select-caret" aria-hidden="true"></span>
+                      </button>
+                      <div class="multi-select-menu" id="pmReturnsMenu" hidden role="group" aria-label="Returns enabled"></div>
+                    </div>
+                  </div>
+                  <div class="field field-multi field-compact field-flag">
+                    <span class="field-label" id="pmMapLabel">MAP</span>
+                    <div class="multi-select" id="pmMapMulti">
+                      <button type="button" class="multi-select-trigger" id="pmMapTrigger" aria-expanded="false" aria-controls="pmMapMenu" aria-labelledby="pmMapLabel">
+                        <span id="pmMapTriggerLabel">Any</span>
+                        <span class="multi-select-caret" aria-hidden="true"></span>
+                      </button>
+                      <div class="multi-select-menu" id="pmMapMenu" hidden role="group" aria-label="MAP enabled"></div>
+                    </div>
+                  </div>
+                  <div class="field field-multi field-compact field-flag">
+                    <span class="field-label" id="pmDashboardsLabel">Dashboards</span>
+                    <div class="multi-select" id="pmDashboardsMulti">
+                      <button type="button" class="multi-select-trigger" id="pmDashboardsTrigger" aria-expanded="false" aria-controls="pmDashboardsMenu" aria-labelledby="pmDashboardsLabel">
+                        <span id="pmDashboardsTriggerLabel">Any</span>
+                        <span class="multi-select-caret" aria-hidden="true"></span>
+                      </button>
+                      <div class="multi-select-menu" id="pmDashboardsMenu" hidden role="group" aria-label="Dashboards enabled"></div>
+                    </div>
+                  </div>
+                  <div class="field field-multi field-compact field-status">
+                    <span class="field-label" id="pmDownloadLabel">Last download</span>
+                    <div class="multi-select" id="pmDownloadMulti">
+                      <button type="button" class="multi-select-trigger" id="pmDownloadTrigger" aria-expanded="false" aria-controls="pmDownloadMenu" aria-labelledby="pmDownloadLabel">
+                        <span id="pmDownloadTriggerLabel">Any date</span>
+                        <span class="multi-select-caret" aria-hidden="true"></span>
+                      </button>
+                      <div class="multi-select-menu" id="pmDownloadMenu" hidden role="group" aria-label="Last download date"></div>
+                    </div>
+                  </div>
+                  <div class="field field-status-toggles pm-filter-priority-toggles" role="group" aria-label="Show only">
+                    <div class="status-toggles">
+                      <label class="status-toggle"><input type="checkbox" class="status-toggle-input" id="pmFilterMarketRevisionMissing" /><span class="status-toggle-box" aria-hidden="true"></span><span class="status-toggle-label">Market revision missing</span></label>
+                      <label class="status-toggle"><input type="checkbox" class="status-toggle-input" id="pmFilterPrintNotReady" /><span class="status-toggle-box" aria-hidden="true"></span><span class="status-toggle-label">Print not ready</span></label>
+                    </div>
+                  </div>
+                </div>
+                <div class="field field-filter-actions pm-filter-secondary-actions">
+                  <button type="button" id="pmBtnResetFilters" class="pdh-filter-btn pdh-filter-btn--reset">Reset</button>
+                  <button type="button" id="pmBtnApplyFilters" class="pdh-filter-btn pdh-filter-btn--apply">Apply</button>
+                </div>
+              </div>
+            </div>
+            </div>
+            <div class="pm-campaign-body">
+            <div class="pm-grid-toolbar summary-tab-header" aria-label="Grid layout">
+              <div class="summary-header-controls ftf-header-controls">
+                <div class="ftf-sort-segmented" role="group" aria-label="Group campaigns">
+                  <span class="ftf-sort-prefix">Group by</span>
+                  <div class="segmented ftf-sort-buttons" id="pmGroupByButtons">
+                    <button type="button" class="segment" data-group-by="none" aria-pressed="false">No grouping</button>
+                    <button type="button" class="segment" data-group-by="partition" aria-pressed="false">Partition</button>
+                    <button type="button" class="segment is-active" data-group-by="year" aria-pressed="true">Campaign Year</button>
+                  </div>
+                </div>
+                <div class="ftf-sort-segmented" role="group" aria-label="Sort campaigns">
+                  <span class="ftf-sort-prefix">Sort</span>
+                  <div class="segmented ftf-sort-buttons" id="pmSortButtons">
+                    <button type="button" class="segment is-active" data-sort="name" aria-pressed="true">Client</button>
+                    <button type="button" class="segment" data-sort="solution" aria-pressed="false">Program</button>
+                    <button type="button" class="segment" data-sort="skew" aria-pressed="false">Email Skew</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="pmCampaignStatus" class="summary-table-status" role="status" aria-live="polite">Open this chapter to load program meta…</div>
+            <div id="pmCampaignGrid" class="ftf-grid"></div>
+            </div>
+          </section>
+        </div>
+
+        <div class="chapter-view chapter-theme--insightsActivity" id="insightsActivityChapter" data-chapter="insightsActivity" hidden>
+          <p class="visually-hidden" id="ipuSubtitle" aria-live="polite">Portal page views — which dashboard, who viewed it, and when.</p>
+          <p class="ipu-hub-scope-note" id="ipuHubScopeNote">Overview scope Partner / Campaign / Year (when set) appear in the scope bar above for context only. Use Portal, date range, Partition, and Dashboard filters below, then Apply.</p>
+          <div class="panel-skeleton" id="ipuSkeleton" hidden>
+            <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+
+          <section class="ipu-panel ipu-setup-panel" id="ipuSetupPanel" hidden aria-labelledby="ipuSetupTitle">
+            <h3 class="ipu-setup-title" id="ipuSetupTitle">Insights Activity could not read PortalActivity</h3>
+            <p class="ipu-setup-message" id="ipuSetupMessage"></p>
+            <ol class="ipu-setup-steps">
+              <li>On this card, alias <code>pageViews</code> should map to the <strong>PortalActivity</strong> dataset (Domo Webform — same source as legacy Analyzer page 2074513896).</li>
+              <li>If mapping looks correct, hard-refresh; webform data loads via the Data API (not SQL).</li>
+            </ol>
+          </section>
+
+          <div class="ipu-sticky-chrome">
+            <section class="toolbar filters-bar ipu-filters-bar ops-filter-surface" aria-label="Insights Activity filters">
+              <div class="filters-bar-head">
+                <div class="scope-filter-cluster" id="ipuScopeFilterCluster">
+                <div class="field field-multi ipu-audience-field">
+                  <span class="field-label" id="ipuPortalLabel">Portal</span>
+                  <div class="multi-select" id="ipuAudienceMulti">
+                    <button type="button" class="multi-select-trigger" id="ipuAudienceTrigger" aria-expanded="false" aria-controls="ipuAudienceMenu" aria-labelledby="ipuPortalLabel">
+                      <span id="ipuAudienceTriggerLabel">All audiences</span>
+                      <span class="multi-select-caret" aria-hidden="true"></span>
+                    </button>
+                    <div class="multi-select-menu" id="ipuAudienceMenu" hidden role="radiogroup" aria-labelledby="ipuPortalLabel"></div>
+                  </div>
+                </div>
+                <div class="field field-multi ipu-range-field">
+                  <span class="field-label" id="ipuRangeLabel">Date range</span>
+                  <div class="multi-select" id="ipuRangeMulti">
+                    <button type="button" class="multi-select-trigger" id="ipuRangeTrigger" aria-expanded="false" aria-controls="ipuRangeMenu" aria-labelledby="ipuRangeLabel">
+                      <span id="ipuRangeTriggerLabel">Last 7 days</span>
+                      <span class="multi-select-caret" aria-hidden="true"></span>
+                    </button>
+                    <div class="multi-select-menu" id="ipuRangeMenu" hidden role="radiogroup" aria-labelledby="ipuRangeLabel"></div>
+                  </div>
+                  <p class="ipu-range-scope-hint" id="ipuRangeScopeHint" hidden></p>
+                </div>
+                <div class="field field-multi ipu-partition-field">
+                  <span class="field-label" id="ipuPartitionLabel">Partition</span>
+                  <div class="multi-select" id="ipuPartitionMulti">
+                    <button type="button" class="multi-select-trigger" id="ipuPartitionTrigger" aria-expanded="false" aria-controls="ipuPartitionMenu" aria-labelledby="ipuPartitionLabel">
+                      <span id="ipuPartitionTriggerLabel">All partitions</span>
+                      <span class="multi-select-caret" aria-hidden="true"></span>
+                    </button>
+                    <div class="multi-select-menu" id="ipuPartitionMenu" hidden role="group" aria-label="Portal partitions (workspace name)"></div>
+                  </div>
+                </div>
+                <div class="field field-multi ipu-dashboard-field">
+                  <span class="field-label" id="ipuPageLabel">Dashboard</span>
+                  <div class="multi-select" id="ipuPageMulti">
+                    <button type="button" class="multi-select-trigger" id="ipuPageTrigger" aria-expanded="false" aria-controls="ipuPageMenu" aria-labelledby="ipuPageLabel">
+                      <span id="ipuPageTriggerLabel">All dashboards</span>
+                      <span class="multi-select-caret" aria-hidden="true"></span>
+                    </button>
+                    <div class="multi-select-menu ipu-page-menu" id="ipuPageMenu" hidden role="group" aria-label="Portal dashboards (page name)"></div>
+                  </div>
+                </div>
+                </div>
+                <div class="filters-bar-suffix">
+                  <div class="field field-search">
+                    <label for="ipuSearch">Search</label>
+                    <input type="search" id="ipuSearch" placeholder="Dashboard, viewer, or partition…" autocomplete="off" />
+                  </div>
+                  <div class="field field-filter-actions">
+                    <button type="button" id="ipuResetFilters" class="pdh-filter-btn pdh-filter-btn--reset">Reset</button>
+                    <button type="button" id="ipuApplyFilters" class="pdh-filter-btn pdh-filter-btn--apply">Apply</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="ipu-summary-chrome">
+            <section class="ipu-metrics-section" aria-label="Summary for applied filters">
+              <div class="ipu-metrics-head">
+                <p class="ipu-metrics-head-label">Key metrics</p>
+                <button type="button" class="ipu-export-report-btn" id="ipuExportReport" aria-describedby="ipuExportReportHint">
+                  <span class="ipu-export-report-btn-icon" aria-hidden="true"></span>
+                  Export report
+                </button>
+              </div>
+              <p class="ipu-export-report-hint" id="ipuExportReportHint">Excel workbook — summary KPIs, charts data, rankings, and full activity log for applied filters.</p>
+              <aside class="ipu-kpi-strip">
+                <div class="ipu-kpi-card">
+                  <p class="ipu-kpi-label">Page views</p>
+                  <p class="ipu-kpi-value" id="ipuKpiViews" aria-live="polite">—</p>
+                </div>
+                <div class="ipu-kpi-card">
+                  <p class="ipu-kpi-label">Viewers</p>
+                  <p class="ipu-kpi-value" id="ipuKpiViewers" aria-live="polite">—</p>
+                </div>
+                <div class="ipu-kpi-card">
+                  <p class="ipu-kpi-label">Dashboards</p>
+                  <p class="ipu-kpi-value" id="ipuKpiDashboards" aria-live="polite">—</p>
+                </div>
+                <div class="ipu-kpi-card">
+                  <p class="ipu-kpi-label">Est. time</p>
+                  <p class="ipu-kpi-value ipu-kpi-value--compact" id="ipuKpiDwell" aria-live="polite" title="Estimated from time until the viewer's next page view (30 min max per gap).">—</p>
+                </div>
+              </aside>
+              <p class="ipu-data-cap-notice" id="ipuDataCapNotice" hidden role="status"></p>
+            </section>
+            <div id="ipuChapterStatus" class="status-bar ipu-chapter-status" role="status" aria-live="polite"></div>
+          </div>
+
+          <div class="ipu-charts-row">
+            <section class="ipu-panel">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">Views Over Time</h2>
+                  <p class="chart-card-subtitle">Daily page views · click a point for that day’s detail</p>
+                </div>
+              </div>
+              <div class="ipu-chart-wrap ipu-chart-wrap--timeline">
+                <canvas id="ipuTimelineChart" aria-label="Daily page views"></canvas>
+              </div>
+            </section>
+          </div>
+
+          <div class="ipu-charts-row ipu-charts-row--secondary">
+            <section class="ipu-panel">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">Unique Viewers Over Time</h2>
+                  <p class="chart-card-subtitle">Distinct viewers per day · click a point for that day’s detail</p>
+                </div>
+              </div>
+              <div class="ipu-chart-wrap ipu-chart-wrap--timeline">
+                <canvas id="ipuUniqueViewersChart" aria-label="Daily unique viewers"></canvas>
+              </div>
+            </section>
+            <section class="ipu-panel ipu-panel--audience">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">Audience Mix</h2>
+                  <p class="chart-card-subtitle">Page views by portal audience · click a slice to filter Portal</p>
+                </div>
+              </div>
+              <div class="ipu-chart-wrap ipu-chart-wrap--donut">
+                <canvas id="ipuAudienceMixChart" aria-label="Internal versus client page views"></canvas>
+              </div>
+            </section>
+            <section class="ipu-panel">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">Top Partitions</h2>
+                  <p class="chart-card-subtitle">By <code>workspace_name</code> · click a bar to filter Partition</p>
+                </div>
+              </div>
+              <div class="ipu-chart-wrap">
+                <canvas id="ipuTopPartitionsChart" aria-label="Top partitions by view count"></canvas>
+              </div>
+            </section>
+          </div>
+
+          <div class="ipu-tables-row">
+            <section class="ipu-panel">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">Top Dashboards</h2>
+                  <p class="chart-card-subtitle">Ranked by views · bar length is relative to the top dashboard · click a row for unique viewers</p>
+                </div>
+              </div>
+              <div class="ipu-bar-legend" id="ipuTopPagesLegend" hidden></div>
+              <div class="table-wrap compact">
+                <table class="data-table" id="ipuTopPagesTable">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="ipu-sortable" data-ipu-sort-table="pages" data-ipu-sort-key="page">Dashboard</th>
+                      <th scope="col" class="ipu-bar-col"><span class="visually-hidden">Relative views</span></th>
+                      <th scope="col" class="num ipu-sortable" data-ipu-sort-table="pages" data-ipu-sort-key="views">Views</th>
+                      <th scope="col" class="num ipu-sortable" data-ipu-sort-table="pages" data-ipu-sort-key="uniqueUsers">Viewers</th>
+                      <th scope="col" class="num ipu-sortable" data-ipu-sort-table="pages" data-ipu-sort-key="estimatedDwellMs" title="Estimated from time until the viewer's next page view (30 min max per gap).">Est. time</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ipuTopPagesBody"></tbody>
+                </table>
+                <p id="ipuTopPagesEmpty" class="panel-empty" hidden>No pages in scope.</p>
+              </div>
+              <div class="table-pager" id="ipuTopPagesPager" hidden>
+                <span class="pager-meta"></span>
+                <div class="pager-btns">
+                  <button type="button" class="pager-btn" data-ipu-pager="pages" data-dir="prev">Previous</button>
+                  <button type="button" class="pager-btn" data-ipu-pager="pages" data-dir="next">Next</button>
+                </div>
+              </div>
+            </section>
+            <section class="ipu-panel">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">Top Viewers</h2>
+                  <p class="chart-card-subtitle">Who viewed · click a row for viewing history (current filters)</p>
+                </div>
+              </div>
+              <div class="table-wrap compact ipu-top-users-wrap" tabindex="0" aria-label="Top viewers table (scroll horizontally for all columns)">
+                <table class="data-table" id="ipuTopUsersTable">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="ipu-sortable" data-ipu-sort-table="users" data-ipu-sort-key="user">Viewer</th>
+                      <th scope="col" class="ipu-sortable" data-ipu-sort-table="users" data-ipu-sort-key="partition">Partition</th>
+                      <th scope="col" class="num ipu-sortable" data-ipu-sort-table="users" data-ipu-sort-key="views">Views</th>
+                      <th scope="col" class="num ipu-sortable" data-ipu-sort-table="users" data-ipu-sort-key="uniquePages">Dashboards</th>
+                      <th scope="col" class="num ipu-sortable" data-ipu-sort-table="users" data-ipu-sort-key="estimatedDwellMs" title="Estimated from time until the viewer's next page view (30 min max per gap).">Est. time</th>
+                      <th scope="col" class="ipu-sortable" data-ipu-sort-table="users" data-ipu-sort-key="lastWhenMs">Last view</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ipuTopUsersBody"></tbody>
+                </table>
+                <p id="ipuTopUsersEmpty" class="panel-empty" hidden>No viewers in scope.</p>
+              </div>
+              <div class="table-pager" id="ipuTopUsersPager" hidden>
+                <span class="pager-meta"></span>
+                <div class="pager-btns">
+                  <button type="button" class="pager-btn" data-ipu-pager="users" data-dir="prev">Previous</button>
+                  <button type="button" class="pager-btn" data-ipu-pager="users" data-dir="next">Next</button>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <section class="ipu-panel" style="margin-bottom: 0.85rem;">
+            <div class="chart-card-header ipu-recent-header">
+              <div>
+                <h2 class="chart-card-title">Recent Activity</h2>
+                <p class="chart-card-subtitle">Row log · click a dashboard or viewer for detail below · table filters do not affect charts or rankings</p>
+              </div>
+              <button type="button" class="pdh-filter-btn ipu-export-btn ipu-export-btn--secondary ipu-export-activity-btn" id="ipuExportActivity">
+                <span class="ipu-export-activity-btn-icon" aria-hidden="true"></span>
+                Activity log (CSV)
+              </button>
+              <div class="ipu-recent-local-filters" aria-label="Recent Activity table filters">
+                <div class="field field-inline">
+                  <label for="ipuRecentSearchDashboard">Dashboard</label>
+                  <input type="search" id="ipuRecentSearchDashboard" placeholder="Filter dashboard…" autocomplete="off" />
+                </div>
+                <div class="field field-inline">
+                  <label for="ipuRecentSearchViewer">Viewer</label>
+                  <input type="search" id="ipuRecentSearchViewer" placeholder="Filter viewer…" autocomplete="off" />
+                </div>
+                <div class="field field-inline">
+                  <label for="ipuRecentSearchPartition">Partition</label>
+                  <input type="search" id="ipuRecentSearchPartition" placeholder="Filter partition…" autocomplete="off" />
+                </div>
+                <button type="button" class="ipu-recent-local-clear" id="ipuRecentLocalClear" hidden>Clear table filters</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table" id="ipuRecentTable">
+                <thead>
+                    <tr>
+                    <th scope="col" class="ipu-sortable" data-ipu-sort-table="recent" data-ipu-sort-key="page">Dashboard (page name)</th>
+                    <th scope="col" class="ipu-sortable" data-ipu-sort-table="recent" data-ipu-sort-key="viewerLabel">Viewer</th>
+                    <th scope="col" class="ipu-sortable" data-ipu-sort-table="recent" data-ipu-sort-key="when">When</th>
+                    <th scope="col" class="num ipu-sortable" data-ipu-sort-table="recent" data-ipu-sort-key="estimatedDwellMs" title="Estimated from time until the viewer's next page view (30 min max per gap).">Est. dwell</th>
+                    <th scope="col" class="ipu-sortable" data-ipu-sort-table="recent" data-ipu-sort-key="partition">Partition</th>
+                  </tr>
+                </thead>
+                <tbody id="ipuRecentBody"></tbody>
+              </table>
+              <p id="ipuRecentEmpty" class="panel-empty" hidden>No page views for the current filters.</p>
+            </div>
+            <div class="table-pager" id="ipuRecentPager" hidden>
+              <span class="pager-meta"></span>
+              <div class="pager-btns">
+                <button type="button" class="pager-btn" data-ipu-pager="recent" data-dir="prev">Previous</button>
+                <button type="button" class="pager-btn" data-ipu-pager="recent" data-dir="next">Next</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="ipu-panel ipu-chart-detail" id="ipuChartDetail" hidden aria-labelledby="ipuChartDetailTitle">
+            <div class="chart-card-header ipu-chart-detail-header">
+              <div>
+                <h2 class="chart-card-title" id="ipuChartDetailTitle">Detail</h2>
+                <p class="chart-card-subtitle" id="ipuChartDetailSubtitle"></p>
+              </div>
+              <div class="ipu-chart-detail-actions">
+                <button type="button" class="ipu-chart-detail-apply" id="ipuChartDetailApply" hidden>Filter to this dashboard</button>
+                <button type="button" class="ipu-chart-detail-close" id="ipuChartDetailClose" aria-label="Close detail">Close</button>
+              </div>
+            </div>
+            <div class="ipu-chart-detail-kpis" id="ipuChartDetailKpis"></div>
+            <div class="ipu-chart-detail-grid" id="ipuChartDetailBody"></div>
+          </section>
+        </div>
+
+        <div class="chapter-view chapter-theme--howWeBuild" id="howWeBuildChapter" data-chapter="howWeBuild" hidden>
+          <div id="howWeBuildMount"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="qa-detail-overlay" class="detail-overlay" tabindex="-1" aria-hidden="true"></div>
+    <aside id="qa-detail-drawer" class="detail-drawer" role="dialog" aria-modal="true" aria-labelledby="qa-detail-drawer-title" aria-hidden="true">
+      <div class="detail-drawer-inner">
+        <div class="detail-drawer-head">
+          <div class="detail-drawer-head-text">
+            <h2 id="qa-detail-drawer-title">Client Details</h2>
+            <p class="detail-drawer-sub" id="qa-detail-drawer-sub"></p>
+          </div>
+          <button type="button" id="btn-close-qa-detail" class="btn-close-help" aria-label="Close client details">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="detail-export-bar" id="qaDetailExportBar" hidden>
+          <button type="button" class="detail-export-btn" id="btn-qa-open-program">Open in Partner Data Health</button>
+        </div>
+        <div class="detail-drawer-body" id="qa-detail-drawer-body"></div>
+      </div>
+    </aside>
+
+    <div id="detail-overlay" class="detail-overlay" tabindex="-1" aria-hidden="true"></div>
+    <aside id="detail-drawer" class="detail-drawer" role="dialog" aria-modal="true" aria-labelledby="detail-drawer-title" aria-hidden="true">
+      <div class="detail-drawer-inner">
+        <div class="detail-drawer-head">
+          <div class="detail-drawer-head-text">
+            <h2 id="detail-drawer-title">Program Details</h2>
+            <p class="detail-drawer-sub" id="detailDrawerSub"></p>
+          </div>
+          <button type="button" id="btn-close-detail" class="btn-close-help" aria-label="Close program details">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="detail-export-bar" id="detailExportBar">
+          <button type="button" class="detail-export-btn" id="btn-export-program-csv">Export program report</button>
+          <button type="button" class="detail-export-btn" id="btn-export-file-csv" disabled>Export latest file report</button>
+        </div>
+        <div class="detail-drawer-body" id="detailDrawerBody"></div>
+      </div>
+    </aside>
+
+    <div id="help-overlay" class="help-overlay" tabindex="-1" aria-hidden="true"></div>
+    <div id="export-confirm-overlay" class="help-overlay" tabindex="-1" aria-hidden="true"></div>
+    <div id="export-confirm-modal" class="help-modal export-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="export-confirm-title" aria-describedby="export-confirm-desc" aria-hidden="true">
+      <div class="help-modal-inner">
+        <div class="help-modal-head">
+          <div class="help-modal-head-title">
+            <h2 id="export-confirm-title">Export full report?</h2>
+          </div>
+          <button type="button" id="btn-close-export-confirm" class="btn-close-help" aria-label="Close">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="help-modal-body">
+          <p id="export-confirm-desc" class="export-confirm-desc">
+            You are about to export a full <strong>3E Operations</strong> report for the current Overview scope. Continue?
+          </p>
+          <div class="export-confirm-actions">
+            <button type="button" class="detail-export-btn export-confirm-btn export-confirm-btn--secondary" id="btn-export-cancel">Cancel</button>
+            <button type="button" class="detail-export-btn export-confirm-btn" id="btn-export-confirm">Export report</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="help-modal" class="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title" aria-hidden="true">
+      <div class="help-modal-inner">
+        <div class="help-modal-head">
+          <div class="help-modal-head-title">
+            <span class="help-modal-mark" aria-hidden="true">?</span>
+            <h2 id="help-modal-title">How to Use 3E Operations</h2>
+          </div>
+          <button type="button" id="btn-close-help" class="btn-close-help" aria-label="Close">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="help-modal-body">
+          <p class="help-intro">
+            Internal Operations Overview card with chapter-style navigation.
+            Start on <strong>Operations</strong> to pick a chapter, or use the chapter bar at the top.
+            Use <strong>Light</strong>, <strong>System</strong>, or <strong>Dark</strong> in the header.
+            Chapter URLs use a hash (for example <code>#campaignTimelines</code> or <code>#partnerDataHealth</code>).
+          </p>
+          <section class="help-section">
+            <h3 class="help-section-title">Chapters</h3>
+            <ul class="help-list">
+              <li><strong>Overview</strong> — set Partner, Campaign, Year, and Program Status, then open a chapter. The same filter bar is on Partner Data Health and Campaign Upload QA.</li>
+              <li><strong>Partner Data Health</strong> — program activity, partner files, downloads, daily load, and campaign totals (rebuild of Analyzer page 559098403).</li>
+              <li><strong>Print Batches</strong> — on-demand and batch print status from <code>PRINT_BATCHES</code>.</li>
+              <li><strong>Campaign Upload QA</strong> — partition upload freshness from Enrollment Metrics (XPL fallback). Uses the same Partner / Campaign / Year / Program Status filters as Partner Data Health. Verbose campaign names map onto codes (CNVA, CNVAU, AWR, and the rest) before joining program activity. Late statuses only include Active programs for that partner + campaign + year. Click a roster row for a client detail panel (upload freshness, matched program, and other campaigns for that client). Year pills: CY25 and CY26. Campaign tabs: All, CNVA, CNVAU, CNVAA, CNVAAFF, CNVASC, CNVD, AWR. Export stale partitions (&gt;10 days) to Excel.</li>
+              <li><strong>Campaign Timelines</strong> — Programs Timeline gantt from <code>TOP_PROGRAMS_ACTIVITY_STATUS</code> (Analyzer page 1151828266). Row is client (<code>PARTITION</code>); bar is first → last activity; color is campaign year. Gold marker = campaign dashboard availability (first activity + 14 days).</li>
+              <li><strong>Campaign Load History</strong> — cumulative membership chart and daily load from <code>leads_programs_xpl</code> keyed on <code>MEMBERSHIP_DATE</code>. Opens on HighPoint (CNVA when that campaign exists) and loads it, unless Overview scope already has a partner. PIT student table is unfiltered.</li>
+              <li><strong>Program Meta</strong> — one card per campaign from <code>VW_PROGRAM_META</code>, joined to email skew, last partner download date, and program activity. Status is the <code>PROGRAM_STATUS</code> value from <code>TOP_PROGRAMS_ACTIVITY_STATUS</code>, matched on <code>PROGRAM_ID</code>. Cards also show whether Returns, MAP, and Dashboards are on (Dashboards is first activity + 14 days), last download, market revision/tier, print ready, and email skew when a match exists. CY26 cards also show Data Quality: a green, yellow, or red status pill (blank is red Pending) and notes when <code>DQ_NOTES</code> has text.</li>
+              <li><strong>Insights Activity</strong> — portal page views (legacy Analyzer page 2074513896): Portal, date range, partition, and dashboard filters (Apply / Reset), KPI strip, sortable tables, drill-down detail, est. dwell, and Export CSV on Recent Activity. Overview scope chips are informational on this chapter — they do not filter the activity log. Deep link: <code>#insightsActivity</code> (legacy <code>#insightsUsage</code> still works).</li>
+              <li><strong>Documentation</strong> — opens on <strong>Portal &amp; Launch</strong>. Dashboard Process Overview is a vertical build path; hover a step or a chapter box, and click a step for the checklist. Other tabs cover tools, Dev vs Prod, and guardrails. Deep link: <code>#howWeBuild</code>.</li>
+            </ul>
+          </section>
+          <section class="help-section">
+            <h3 class="help-section-title">Filters</h3>
+            <ul class="help-list">
+              <li><strong>Overview</strong>, <strong>Partner Data Health</strong>, and <strong>Campaign Upload QA</strong> share the filter bar under the chapter tabs. Change Partner, Campaign, Year, or Status, then click <strong>Apply</strong>. Use the search box inside each dropdown to narrow its checklist. <strong>Reset</strong> clears Overview scope (partner, campaign, year, and inherited portal partition) and sets Program Status to All statuses — pick scope again and Apply to reload tables. Partner Data Health shows Activity, Files, Downloads, Daily Load, and Totals on one page. Deep links can scroll to a table, for example <code>#partnerDataHealth/downloads</code>.</li>
+              <li>Other chapters keep their own controls (year pills, program tabs, client pickers). Choose Partner (and optionally Campaign / Year) under Partner Data Health or Campaign Upload QA, then click <strong>Apply</strong> — that Overview scope flows to Program Meta, Timelines, Load History, and Print Batches (chips on those chapters summarize what is inherited). <strong>Insights Activity</strong> uses its own filters only; Overview scope is shown for context. Portal <code>PARTITION</code> filters apply the same way when the scope filter bar is set to all partners. Program Meta still has Returns, MAP, Dashboards, Last download, and Status filters local to that chapter. Status lists the raw <code>PROGRAM_STATUS</code> values from program activity (matched on program ID) and does not follow the Overview Active / Inactive / Development filter. Chapter <strong>Reset</strong> returns Program Meta to the latest year and all statuses, then puts the current Overview partner, campaign, and year back when that scope is set.</li>
+              <li><strong>Partner</strong>, <strong>Campaign</strong>, and <strong>Campaign Year</strong> are multi-select. Leave empty for all. Opening any one of those three opens all three together; options update live as you check partners (for example pick High Point and the campaign and year lists immediately show only what applies). Options also cascade in every direction. Each dropdown has <strong>Clear section</strong>; <strong>Reset</strong> clears everything at once.</li>
+              <li><strong>Program Status</strong> filters Program Activity, partner files, downloads, daily load, and campaign totals: Active, Inactive, and Development (from <code>PROGRAM_STATUS</code> / <code>ACTIVE_FLAG</code>). A row with no matched program stays visible. Default is All statuses.</li>
+              <li>Portal page filters should use <code>PARTITION</code>, not <code>CLIENT</code>. The latest campaign year is selected on first load so heavy tables stay small.</li>
+              <li>Partners whose partition name starts with <code>z_</code> are excluded from filters, tables, and rosters (test/sandbox accounts).</li>
+            </ul>
+          </section>
+          <section class="help-section">
+            <h3 class="help-section-title">Dashboard availability</h3>
+            <ul class="help-list">
+              <li><strong>Campaign dashboards</strong> — expected in the client portal about <strong>two weeks</strong> after the program’s first activity (<code>FIRST_ACTIVITY</code> from <code>TOP_PROGRAMS_ACTIVITY_STATUS</code>). Partner Data Health and Campaign Upload QA show this date on program detail; Campaign Timelines marks it on the gantt.</li>
+              <li><strong>Cross-campaign dashboards</strong> — timing follows the <strong>CNVA</strong> program for the same partner and campaign year (year switch and launch). When CNVA exists, Partner Data Health shows a separate <strong>Cross-campaign availability</strong> line on the detail drawer. Finer rules for specific portal pages may still need ops confirmation.</li>
+            </ul>
+          </section>
+          <section class="help-section">
+            <h3 class="help-section-title">Tables</h3>
+            <ul class="help-list">
+              <li><strong>Program Activity</strong> — first/last activity and days since last touched from <code>TOP_PROGRAMS_ACTIVITY_STATUS</code>. Click a row on any Partner Data Health table to open a detail panel with file funnel, downloads, daily load, and campaign totals. Use <strong>Export program report</strong> or <strong>Export latest file report</strong> in the drawer, or <strong>Export table</strong> on a card to download the filtered rows as Excel. Campaign Upload QA roster rows open a client detail panel; use <strong>Open in Partner Data Health</strong> when a program match exists.</li>
+              <li><strong>Partner Data Files Detail</strong> — funnel counts from <code>PARTNER_FILES_SUMMARY</code> using the Analyzer column names: <code>APP_ST</code> (App Started), <code>APP_SUB</code> (App Submits), <code>APP_COMP</code> (Apps Complete), <code>APP_STXSUB</code> (started not submitted; a negative source count is shown as 0, and the detail drawer states the source value), plus admits/deposits/enrollments and the rest of the file metrics. Partner and campaign stay pinned while you scroll sideways. Rows are clickable; Export table downloads the current filter set.</li>
+              <li><strong>Partner Downloads</strong> — download events from <code>VW_PARTNER_DOWNLOADS_KMK</code>, matching Analyzer card <strong>PDH Partner Downloads</strong>: Download Date (<code>EVENT_DATE</code>), Partner (<code>CLIENT</code>), Campaign (<code>CAMPAIGN</code>), Campaign Year (<code>CY</code> or <code>CAMPAIGN_YEAR</code>; a <code>CY##</code> token in the file name is used only when those columns return nothing), and File (<code>FILE_NAME</code>). Overview scope year and campaign filters match tokens/codes (so <code>2026</code> lines up with <code>CY26</code>, and <code>CNVA</code> lines up with Conversion Apply). Program Status applies the same way as the file and load tables. Undated return files such as <code>DAO</code> drop out when a year is selected. Click a row for program details; Export table downloads the current view.</li>
+              <li><strong>Daily Load Details</strong> — membership load by date from <code>PROGRAM_LOAD_HISTORY</code>, with a running total of records loaded. Click a row for program details; Export table includes the running total.</li>
+              <li><strong>Campaign Totals</strong> — record counts from <code>PARTNER DASH LEADS_PROGRAMS_XPL</code>, aggregated for the selected year and/or partner. Click a row for program details; Export table downloads the current view.</li>
+              <li>Each table shows 50 rows per page. Files apply year from a real <code>CY##</code> value or a <code>CY##</code> token in the file name. Downloads require that same campaign-year token when a year is selected, so undated <code>DAO</code> files do not fill the table. Daily Load and Totals filter on <code>CAMPAIGN_YEAR</code>.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <script src="vendor/exceljs.min.js"></script>
+    <script src="vendor/chart.umd.min.js"></script>
+    <script src="vendor/domo.js"></script>
+    <script src="ops-join.js"></script>
+    <script src="ops-ui.js"></script>
+    <script src="ops-filter-menu.js"></script>
+    <script src="ops-export-report.js"></script>
+    <script src="print-batches-tab.js"></script>
+    <script src="campaign-upload-qa-tab.js"></script>
+    <script src="campaign-timelines-tab.js"></script>
+    <script src="campaign-load-history-tab.js"></script>
+    <script src="program-meta-tab.js"></script>
+    <script src="how-we-build.js"></script>
+    <script src="insights-portal-usage-tab.js"></script>
+    <script src="ops-command-center.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "eee_3e_operations",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "dev": "domo dev",
+    "domo:login": "domo login",
+    "domo:publish": "domo publish",
+    "test": "node ops-join.test.js && node ops-ui.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Domo App Framework: 3E Operations — internal Operations Overview (Partner Data Health, Print Batches, Campaign Upload QA, and more). See README.md.",
+  "devDependencies": {
+    "ryuu": "^5.0.4"
+  }
+}
